@@ -3,4 +3,6 @@ window.SHOPFUN_CONFIG = {
   SUPABASE_URL: "https://nplneyuyosrtozkfcadi.supabase.co",
   SUPABASE_KEY: "sb_publishable_xlQul7ZjWhxr2ELuyRE5yg_4I9COBOI",
   ADMIN_EMAIL: "chiwen5288@gmail.com",
+  IG_URL: "https://www.instagram.com/nicolas0929_liu/",
+  DONATE_URL: "https://portaly.cc/nicolasliu/support",
 };

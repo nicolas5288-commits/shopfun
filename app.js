@@ -28,6 +28,9 @@ const state = {
   user: null,
   liked: new Set(),
   wishlist: new Map(), // product_id -> bought(bool)
+  profile: null,       // {nickname, avatar_emoji, avatar_bg}
+  unread: 0,           // 未讀通知數
+  nickById: new Map(), // user_id -> nickname（顯示「由 X 推薦」）
 };
 
 const $app = document.getElementById("app");
@@ -75,6 +78,14 @@ async function loadData() {
   if (!ok) await loadSeed();
   state.byId.clear();
   Object.values(state.products).flat().forEach((p) => state.byId.set(p.id, p));
+  // 投稿者暱稱（顯示「由 X 推薦」）；表不存在就略過
+  if (supa && ok) {
+    try {
+      const { data: profs } = await supa.from("profiles").select("user_id,nickname");
+      state.nickById = new Map();
+      (profs || []).forEach((pr) => { if (pr.nickname) state.nickById.set(pr.user_id, pr.nickname); });
+    } catch (e) { /* profiles 表還沒建，略過 */ }
+  }
   state.loaded = true;
 }
 async function loadSeed() {
@@ -97,13 +108,20 @@ async function refreshUser() {
 async function loadUserState() {
   state.liked = new Set();
   state.wishlist = new Map();
+  state.profile = null;
+  state.unread = 0;
   if (!supa || !state.user) return;
-  const [{ data: likes }, { data: wish }] = await Promise.all([
-    supa.from("likes").select("product_id").eq("user_id", state.user.id),
-    supa.from("wishlist").select("product_id,bought").eq("user_id", state.user.id),
+  const uid = state.user.id;
+  const [likesR, wishR, profR, unreadR] = await Promise.allSettled([
+    supa.from("likes").select("product_id").eq("user_id", uid),
+    supa.from("wishlist").select("product_id,bought").eq("user_id", uid),
+    supa.from("profiles").select("nickname,avatar_emoji,avatar_bg").eq("user_id", uid).maybeSingle(),
+    supa.from("notifications").select("id", { count: "exact", head: true }).eq("user_id", uid).eq("read", false),
   ]);
-  (likes || []).forEach((l) => state.liked.add(l.product_id));
-  (wish || []).forEach((w) => state.wishlist.set(w.product_id, w.bought));
+  if (likesR.status === "fulfilled") (likesR.value.data || []).forEach((l) => state.liked.add(l.product_id));
+  if (wishR.status === "fulfilled") (wishR.value.data || []).forEach((w) => state.wishlist.set(w.product_id, w.bought));
+  if (profR.status === "fulfilled" && profR.value.data) state.profile = profR.value.data;
+  if (unreadR.status === "fulfilled" && typeof unreadR.value.count === "number") state.unread = unreadR.value.count;
 }
 async function login() {
   if (!supa) return toast("登入功能尚未設定");
@@ -113,10 +131,23 @@ async function login() {
 async function logout() {
   await supa.auth.signOut();
   state.user = null; state.liked = new Set(); state.wishlist = new Map();
-  renderRight(); route();
+  state.profile = null; state.unread = 0;
+  renderRight(); location.hash = "#/"; route();
   toast("已登出");
 }
 function requireLogin() { toast("請先用 Google 登入 👇"); login(); }
+
+function displayName() {
+  return state.profile?.nickname || state.user?.user_metadata?.name || state.user?.email || "我";
+}
+function avatarHTML() {
+  const u = state.user;
+  if (state.profile?.avatar_emoji) {
+    return `<span class="avatar-emoji" style="background:${esc(state.profile.avatar_bg || "#F3E2D8")}">${esc(state.profile.avatar_emoji)}</span>`;
+  }
+  if (u?.user_metadata?.avatar_url) return `<img src="${esc(u.user_metadata.avatar_url)}" alt="" referrerpolicy="no-referrer">`;
+  return `<span class="avatar-fallback">${esc(displayName()[0] || "我")}</span>`;
+}
 
 /* ---------- 頂欄 ---------- */
 function renderNav(active) {
@@ -127,23 +158,28 @@ function renderNav(active) {
 function renderRight() {
   if (!supa) { $right.innerHTML = ""; return; }
   if (state.user) {
-    const u = state.user;
-    const name = u.user_metadata?.name || u.email || "我";
-    const avatar = u.user_metadata?.avatar_url
-      ? `<img src="${esc(u.user_metadata.avatar_url)}" alt="" referrerpolicy="no-referrer">`
-      : `<span class="avatar-fallback">${esc(name[0] || "我")}</span>`;
+    const dot = state.unread > 0 ? `<span class="tb-dot"></span>` : "";
+    const donateItem = cfg.DONATE_URL ? `<a href="${esc(cfg.DONATE_URL)}" target="_blank" rel="noopener" class="tb-mi">☕ 小額贊助</a>` : "";
     $right.innerHTML = `
       ${isAdmin() ? `<a href="#/admin" class="tb-link tb-admin" title="管理後台">⚙️ 管理</a>` : ""}
       <a href="#/list" class="tb-link" title="我的清單">🧳 清單</a>
       <a href="#/submit" class="tb-link tb-cta">＋ 推好物</a>
-      <div class="tb-user" id="tbUser">${avatar}</div>
+      <div class="tb-user" id="tbUser">${avatarHTML()}${dot}</div>
       <div class="tb-menu" id="tbMenu" hidden>
-        <div class="tb-menu-name">${esc(name)}</div>
-        <button id="btnLogout">登出</button>
+        <div class="tb-menu-name">${esc(displayName())}</div>
+        <a href="#/profile" class="tb-mi">👤 個人設定</a>
+        <a href="#/notifications" class="tb-mi">🔔 通知中心${state.unread > 0 ? ` <span class="tb-badge">${state.unread}</span>` : ""}</a>
+        <a href="#/hot" class="tb-mi">🔥 近期熱門</a>
+        <div class="tb-mdiv"></div>
+        <a href="${esc(cfg.IG_URL || "#")}" target="_blank" rel="noopener" class="tb-mi">📩 聯繫我們</a>
+        ${donateItem}
+        <div class="tb-mdiv"></div>
+        <button id="btnLogout" class="tb-mi">登出</button>
       </div>`;
     const menu = document.getElementById("tbMenu");
     document.getElementById("tbUser").onclick = (e) => { e.stopPropagation(); menu.hidden = !menu.hidden; };
     document.getElementById("btnLogout").onclick = logout;
+    menu.querySelectorAll("a").forEach((a) => a.onclick = () => { menu.hidden = true; });
     document.addEventListener("click", () => { menu.hidden = true; }, { once: true });
   } else {
     $right.innerHTML = `<button class="tb-login" id="btnLogin">Google 登入</button>`;
@@ -223,7 +259,7 @@ function renderGrid(code) {
     return;
   }
   grid.innerHTML = items.map((p, i) => productCard(p, i + 1)).join("");
-  bindCardEvents(grid, code);
+  bindCardEvents(grid);
 }
 
 function renderQuarantine(code) {
@@ -239,21 +275,25 @@ function renderQuarantine(code) {
       <p>網友推薦、還沒上榜。幫忙按讚，滿 ${PROMOTE_AT} 讚就正式進排行榜！</p>
     </div>
     <div class="product-grid">${items.map((p) => productCard(p, null)).join("")}</div>`;
-  bindCardEvents(box, code);
+  bindCardEvents(box);
 }
 
-function productCard(p, rank) {
+function productCard(p, rank, opts = {}) {
   const liked = state.liked.has(p.id);
   const inList = state.wishlist.has(p.id);
   const isNew = p.status === "new";
   const progress = isNew ? Math.min(100, Math.round(((p.like_count || 0) / PROMOTE_AT) * 100)) : 0;
   const rankLabel = rank ? `NO.${String(rank).padStart(2, "0")}　` : "";
+  const flagLabel = opts.showCountry && COUNTRIES[p.country] ? `<span class="cat-badge">${COUNTRIES[p.country].flag} ${COUNTRIES[p.country].name}</span>` : "";
+  const submitTag = p.source === "user"
+    ? `<span class="pc-tag-user">由 ${esc(state.nickById.get(p.submitted_by) || "網友")} 推薦</span>`
+    : "";
   return `
     <article class="product-card chip-${esc(p.category)}" data-pid="${esc(p.id)}">
       <div class="pc-top">
         <div class="pc-emoji">${esc(p.emoji || "🛍️")}</div>
         <div class="pc-head">
-          <div class="pc-rank">${rankLabel}<span class="cat-badge">${CATEGORIES[p.category] || ""}</span>${p.source === "user" ? `<span class="pc-tag-user">網友推薦</span>` : ""}</div>
+          <div class="pc-rank">${rankLabel}${flagLabel}<span class="cat-badge">${CATEGORIES[p.category] || ""}</span>${submitTag}</div>
           <div class="pc-name">${esc(p.name_zh)}</div>
           ${p.name_local ? `<div class="pc-local">${esc(p.name_local)}</div>` : ""}
         </div>
@@ -278,14 +318,14 @@ function productCard(p, rank) {
     </article>`;
 }
 
-function bindCardEvents(root, code) {
-  root.querySelectorAll("[data-like]").forEach((b) => b.onclick = () => toggleLike(b.dataset.like, code));
+function bindCardEvents(root) {
+  root.querySelectorAll("[data-like]").forEach((b) => b.onclick = () => toggleLike(b.dataset.like));
   root.querySelectorAll("[data-wish]").forEach((b) => b.onclick = () => toggleWish(b.dataset.wish));
   root.querySelectorAll("[data-report]").forEach((b) => b.onclick = () => reportProduct(b.dataset.report));
 }
 
 /* ---------- 互動：按讚 / 清單 / 檢舉 ---------- */
-async function toggleLike(id, code) {
+async function toggleLike(id) {
   if (!state.user) return requireLogin();
   const p = state.byId.get(id); if (!p) return;
   const liked = state.liked.has(id);
@@ -301,7 +341,7 @@ async function toggleLike(id, code) {
     if (error) { state.liked.delete(id); p.like_count--; updateLikeUI(id); toast("操作失敗，再試一次"); return; }
     if (p.status === "new" && p.like_count >= PROMOTE_AT) {
       p.status = "ranked"; toast(`🎉 ${p.name_zh} 集滿 ${PROMOTE_AT} 讚，正式上榜！`);
-      renderGrid(code); renderQuarantine(code);
+      if (document.getElementById("grid")) { renderGrid(p.country); renderQuarantine(p.country); }
     }
   }
 }
@@ -452,6 +492,141 @@ async function submitProduct(e) {
   location.hash = `#/country/${rec.country}`;
 }
 
+/* ---------- 🔥 近期熱門 ---------- */
+const hotState = { tab: "week", weekCount: null };
+async function renderHot() {
+  renderNav(null);
+  document.title = "近期熱門｜購物趣";
+  $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">🔥 近期熱門</h1>
+    <div class="adm-tabs">
+      <button class="cat-tab ${hotState.tab === "week" ? "active" : ""}" data-htab="week">近 7 天竄紅</button>
+      <button class="cat-tab ${hotState.tab === "all" ? "active" : ""}" data-htab="all">👑 歷史總榜</button>
+    </div></section>
+    <section class="product-grid" id="grid"></section>`;
+  $app.querySelectorAll("[data-htab]").forEach((b) => b.onclick = () => {
+    hotState.tab = b.dataset.htab;
+    $app.querySelectorAll("[data-htab]").forEach((x) => x.classList.toggle("active", x === b));
+    renderHotGrid();
+  });
+  if (hotState.tab === "week" && !hotState.weekCount) await loadWeekCounts();
+  renderHotGrid();
+  window.scrollTo(0, 0);
+}
+async function loadWeekCounts() {
+  hotState.weekCount = new Map();
+  if (!supa) return;
+  const since = new Date(Date.now() - 7 * 86400000).toISOString();
+  const { data } = await supa.from("likes").select("product_id,created_at").gte("created_at", since);
+  (data || []).forEach((l) => hotState.weekCount.set(l.product_id, (hotState.weekCount.get(l.product_id) || 0) + 1));
+}
+async function renderHotGrid() {
+  const grid = document.getElementById("grid");
+  if (!grid) return;
+  let items = Object.values(state.products).flat().filter((p) => p.status === "ranked");
+  if (hotState.tab === "week") {
+    if (!hotState.weekCount) { await loadWeekCounts(); }
+    items = items.map((p) => ({ p, n: hotState.weekCount.get(p.id) || 0 }))
+      .filter((x) => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 30).map((x) => x.p);
+  } else {
+    items = items.filter((p) => (p.like_count || 0) > 0).sort((a, b) => (b.like_count || 0) - (a.like_count || 0)).slice(0, 30);
+  }
+  if (!items.length) {
+    grid.innerHTML = `<div class="empty-state"><div class="big">🌱</div><p>${hotState.tab === "week" ? "這 7 天還沒人按讚，快去當第一個！" : "還沒有人按讚，快去逛逛把好物頂上來！"}</p></div>`;
+    return;
+  }
+  grid.innerHTML = items.map((p, i) => productCard(p, i + 1, { showCountry: true })).join("");
+  bindCardEvents(grid);
+}
+
+/* ---------- 👤 個人設定 ---------- */
+const AVATAR_EMOJIS = ["😀","😎","🥰","🤩","😴","🧑","👩","🧔","🐱","🐶","🐰","🦊","🐼","🐸","🍓","🍑","🍜","🍣","✈️","🧳","🛍️","⭐","🌸","🔥"];
+const AVATAR_BGS = ["#F3E2D8","#E3D3D8","#D3DBE0","#D5DDD3","#E6DCCB","#EADFF0"];
+function renderProfile() {
+  renderNav(null);
+  document.title = "個人設定｜購物趣";
+  if (!state.user) {
+    $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">👤 個人設定</h1>
+      <div class="empty-state"><div class="big">🔒</div><p>登入後就能設定暱稱和頭像。</p>
+      <button class="hero-cta" onclick="__login()">用 Google 登入</button></div></section>`;
+    return;
+  }
+  const cur = state.profile || {};
+  const selEmoji = cur.avatar_emoji || "😀";
+  const selBg = cur.avatar_bg || AVATAR_BGS[0];
+  const emojiGrid = AVATAR_EMOJIS.map((e) => `<button type="button" class="emoji-opt ${e === selEmoji ? "on" : ""}" data-emoji="${esc(e)}">${e}</button>`).join("");
+  const bgGrid = AVATAR_BGS.map((c) => `<button type="button" class="bg-opt ${c === selBg ? "on" : ""}" data-bg="${c}" style="background:${c}"></button>`).join("");
+  $app.innerHTML = `<section class="page-narrow">
+    <h1 class="page-title">👤 個人設定</h1>
+    <div class="prof-preview"><span class="avatar-emoji lg" id="profPreview" style="background:${esc(selBg)}">${esc(selEmoji)}</span>
+      <div><div class="prof-preview-name" id="profPreviewName">${esc(cur.nickname || displayName())}</div><div class="prof-preview-sub">你在購物趣的樣子</div></div></div>
+    <form class="sub-form" id="profForm">
+      <label>暱稱<input name="nickname" maxlength="20" value="${esc(cur.nickname || "")}" placeholder="給自己取個名字（1-20 字）"></label>
+      <div><div class="prof-label">選一個頭像</div><div class="emoji-grid" id="emojiGrid">${emojiGrid}</div></div>
+      <div><div class="prof-label">背景色</div><div class="bg-grid" id="bgGrid">${bgGrid}</div></div>
+      <button type="submit" class="sub-btn">儲存</button>
+      <div class="sub-msg" id="profMsg"></div>
+    </form>
+  </section>`;
+  let pick = { emoji: selEmoji, bg: selBg };
+  const preview = document.getElementById("profPreview");
+  const nameInput = $app.querySelector('[name="nickname"]');
+  nameInput.oninput = () => { document.getElementById("profPreviewName").textContent = nameInput.value || displayName(); };
+  $app.querySelectorAll("[data-emoji]").forEach((b) => b.onclick = () => {
+    pick.emoji = b.dataset.emoji; preview.textContent = pick.emoji;
+    $app.querySelectorAll("[data-emoji]").forEach((x) => x.classList.toggle("on", x === b));
+  });
+  $app.querySelectorAll("[data-bg]").forEach((b) => b.onclick = () => {
+    pick.bg = b.dataset.bg; preview.style.background = pick.bg;
+    $app.querySelectorAll("[data-bg]").forEach((x) => x.classList.toggle("on", x === b));
+  });
+  document.getElementById("profForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const nickname = nameInput.value.trim() || null;
+    const rec = { user_id: state.user.id, nickname, avatar_emoji: pick.emoji, avatar_bg: pick.bg, updated_at: new Date().toISOString() };
+    const btn = e.target.querySelector(".sub-btn"); btn.disabled = true; btn.textContent = "儲存中…";
+    const { error } = await supa.from("profiles").upsert(rec);
+    btn.disabled = false; btn.textContent = "儲存";
+    if (error) { document.getElementById("profMsg").textContent = "儲存失敗：" + error.message; return; }
+    state.profile = { nickname, avatar_emoji: pick.emoji, avatar_bg: pick.bg };
+    if (nickname) state.nickById.set(state.user.id, nickname);
+    renderRight();
+    toast("已儲存 ✨");
+  });
+  window.scrollTo(0, 0);
+}
+
+/* ---------- 🔔 通知中心 ---------- */
+async function renderNotifications() {
+  renderNav(null);
+  document.title = "通知中心｜購物趣";
+  if (!state.user) {
+    $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">🔔 通知中心</h1>
+      <div class="empty-state"><div class="big">🔒</div><p>登入後這裡會顯示你的商品上榜、被下架等通知。</p>
+      <button class="hero-cta" onclick="__login()">用 Google 登入</button></div></section>`;
+    return;
+  }
+  $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">🔔 通知中心</h1><div id="notiList"><div class="empty-state"><div class="big">⏳</div><p>載入中…</p></div></div></section>`;
+  const { data } = await supa.from("notifications").select("*").eq("user_id", state.user.id).order("created_at", { ascending: false });
+  const box = document.getElementById("notiList");
+  if (!data || !data.length) { box.innerHTML = `<div class="empty-state"><div class="big">📭</div><p>還沒有通知。推薦好物、集讚上榜後這裡會通知你！</p></div>`; }
+  else {
+    box.innerHTML = data.map((n) => {
+      const icon = n.type === "promoted" ? "🎉" : "🗑";
+      const text = n.type === "promoted"
+        ? `你推薦的「<b>${esc(n.product_name || "商品")}</b>」集滿讚，正式上榜了！`
+        : `你推薦的「<b>${esc(n.product_name || "商品")}</b>」已被下架。`;
+      const date = new Date(n.created_at).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" });
+      return `<div class="noti-item ${n.read ? "" : "unread"}"><span class="noti-icon">${icon}</span><div class="noti-body"><div class="noti-text">${text}</div><div class="noti-date">${date}</div></div></div>`;
+    }).join("");
+  }
+  // 進頁面即全部標已讀
+  if (state.unread > 0) {
+    await supa.from("notifications").update({ read: true }).eq("user_id", state.user.id).eq("read", false);
+    state.unread = 0; renderRight();
+  }
+  window.scrollTo(0, 0);
+}
+
 /* ---------- 管理後台 ---------- */
 const ADMIN_TABS = { reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
 const adm = { products: [], likeCount: new Map(), tab: "reported", search: "", country: "all", loading: false };
@@ -569,6 +744,9 @@ async function route() {
   let m;
   if ((m = hash.match(/^#\/country\/(\w+)/))) { state.cat = "all"; renderCountry(m[1]); }
   else if (hash.startsWith("#/admin")) renderAdmin();
+  else if (hash.startsWith("#/hot")) renderHot();
+  else if (hash.startsWith("#/profile")) renderProfile();
+  else if (hash.startsWith("#/notifications")) renderNotifications();
   else if (hash.startsWith("#/list")) renderList();
   else if (hash.startsWith("#/submit")) renderSubmit();
   else renderHome();
