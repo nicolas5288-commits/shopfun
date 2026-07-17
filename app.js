@@ -22,9 +22,10 @@ const LEVELS = [
 ];
 function levelOf(score) { return LEVELS.find((l) => score >= l.min) || LEVELS[LEVELS.length - 1]; }
 function nextLevel(score) { const above = LEVELS.filter((l) => l.min > score); return above.length ? above[above.length - 1] : null; }
-// 依已載入的 products 算某人的貢獻分（獲讚總數 + 上榜數×20）
+// 依已載入的 products 算某人的貢獻分（獲讚×1 + 上榜×20 + 補圖通過×15）
+const IMG_POINTS = 15;
 function scoreOf(userId) {
-  if (!userId) return { score: 0, likes: 0, ranked: 0 };
+  if (!userId) return { score: 0, likes: 0, ranked: 0, imgs: 0 };
   let likes = 0, ranked = 0;
   state.byId.forEach((p) => {
     if (p.submitted_by === userId) {
@@ -32,7 +33,8 @@ function scoreOf(userId) {
       if (p.status === "ranked") ranked += 1;
     }
   });
-  return { score: likes + ranked * 20, likes, ranked };
+  const imgs = state.imgCountById.get(userId) || 0;
+  return { score: likes + ranked * 20 + imgs * IMG_POINTS, likes, ranked, imgs };
 }
 
 const cfg = window.SHOPFUN_CONFIG || {};
@@ -55,6 +57,7 @@ const state = {
   profile: null,       // {nickname, avatar_emoji, avatar_bg}
   unread: 0,           // 未讀通知數
   nickById: new Map(), // user_id -> nickname（顯示「由 X 推薦」）
+  imgCountById: new Map(), // user_id -> 通過的補圖數（算貢獻分）
 };
 
 const $app = document.getElementById("app");
@@ -102,13 +105,16 @@ async function loadData() {
   if (!ok) await loadSeed();
   state.byId.clear();
   Object.values(state.products).flat().forEach((p) => state.byId.set(p.id, p));
-  // 投稿者暱稱（顯示「由 X 推薦」）；表不存在就略過
+  // 投稿者暱稱（顯示「由 X 推薦」）＋補圖通過數（算分）；表不存在就略過
   if (supa && ok) {
-    try {
-      const { data: profs } = await supa.from("profiles").select("user_id,nickname");
-      state.nickById = new Map();
-      (profs || []).forEach((pr) => { if (pr.nickname) state.nickById.set(pr.user_id, pr.nickname); });
-    } catch (e) { /* profiles 表還沒建，略過 */ }
+    const [profR, imgR] = await Promise.allSettled([
+      supa.from("profiles").select("user_id,nickname"),
+      supa.from("image_submissions").select("user_id").eq("status", "approved"),
+    ]);
+    state.nickById = new Map();
+    if (profR.status === "fulfilled") (profR.value.data || []).forEach((pr) => { if (pr.nickname) state.nickById.set(pr.user_id, pr.nickname); });
+    state.imgCountById = new Map();
+    if (imgR.status === "fulfilled") (imgR.value.data || []).forEach((r) => state.imgCountById.set(r.user_id, (state.imgCountById.get(r.user_id) || 0) + 1));
   }
   state.loaded = true;
 }
@@ -198,6 +204,7 @@ function renderRight() {
         <a href="#/notifications" class="tb-mi">🔔 通知中心${state.unread > 0 ? ` <span class="tb-badge">${state.unread}</span>` : ""}</a>
         <a href="#/hot" class="tb-mi">🔥 近期熱門</a>
         <div class="tb-mdiv"></div>
+        <button class="tb-mi" id="miGuide">❓ 使用說明</button>
         <button class="tb-mi" id="miInstall">📲 加到主畫面</button>
         ${cfg.COMMUNITY_URL ? `<a href="${esc(cfg.COMMUNITY_URL)}" target="_blank" rel="noopener" class="tb-mi">👥 使用者社群</a>` : ""}
         <a href="${esc(cfg.IG_URL || "#")}" target="_blank" rel="noopener" class="tb-mi">📩 聯繫我們</a>
@@ -208,6 +215,7 @@ function renderRight() {
     const menu = document.getElementById("tbMenu");
     document.getElementById("tbUser").onclick = (e) => { e.stopPropagation(); menu.hidden = !menu.hidden; };
     document.getElementById("btnLogout").onclick = logout;
+    document.getElementById("miGuide").onclick = () => { menu.hidden = true; showGuideModal(); };
     document.getElementById("miInstall").onclick = () => { menu.hidden = true; showInstallModal(); };
     menu.querySelectorAll("a").forEach((a) => a.onclick = () => { menu.hidden = true; });
     document.addEventListener("click", () => { menu.hidden = true; }, { once: true });
@@ -322,13 +330,15 @@ function productCard(p, rank, opts = {}) {
   return `
     <article class="product-card chip-${esc(p.category)}" data-pid="${esc(p.id)}">
       <div class="pc-top">
-        <div class="pc-emoji">${esc(p.emoji || "🛍️")}</div>
+        ${p.image_url
+          ? `<div class="pc-emoji pc-photo"><img src="${esc(p.image_url)}" alt="${esc(p.name_zh)}" loading="lazy" referrerpolicy="no-referrer"></div>`
+          : `<div class="pc-emoji">${esc(p.emoji || "🛍️")}</div>`}
         <div class="pc-head">
           <div class="pc-rank">${rankLabel}${flagLabel}<span class="cat-badge">${CATEGORIES[p.category] || ""}</span>${submitTag}</div>
           <div class="pc-name">${esc(p.name_zh)}</div>
           <div class="pc-local">${p.name_local ? esc(p.name_local) : "&nbsp;"}</div>
         </div>
-        <button class="pc-report" data-report="${esc(p.id)}" title="檢舉不當內容">⋯</button>
+        <button class="pc-report" data-menu="${esc(p.id)}" title="更多">⋯</button>
       </div>
       <p class="pc-reason">${esc(p.reason)}</p>
       <div class="pc-info">
@@ -350,7 +360,24 @@ function productCard(p, rank, opts = {}) {
 function bindCardEvents(root) {
   root.querySelectorAll("[data-like]").forEach((b) => b.onclick = () => toggleLike(b.dataset.like));
   root.querySelectorAll("[data-wish]").forEach((b) => b.onclick = () => toggleWish(b.dataset.wish));
-  root.querySelectorAll("[data-report]").forEach((b) => b.onclick = () => reportProduct(b.dataset.report));
+  root.querySelectorAll("[data-menu]").forEach((b) => b.onclick = (e) => { e.stopPropagation(); showCardMenu(b, b.dataset.menu); });
+}
+
+/* ---------- 卡片 ⋯ 選單（檢舉 / 補圖）---------- */
+function showCardMenu(btn, pid) {
+  document.querySelector(".card-menu")?.remove();
+  const r = btn.getBoundingClientRect();
+  const menu = document.createElement("div");
+  menu.className = "card-menu";
+  menu.style.top = `${r.bottom + window.scrollY + 4}px`;
+  menu.style.left = `${Math.min(r.left + window.scrollX, window.innerWidth - 160)}px`;
+  menu.innerHTML = `
+    <button data-act="photo">📷 幫忙補圖</button>
+    <button data-act="report">⚠️ 檢舉</button>`;
+  document.body.appendChild(menu);
+  menu.querySelector('[data-act="photo"]').onclick = () => { menu.remove(); showPhotoModal(pid); };
+  menu.querySelector('[data-act="report"]').onclick = () => { menu.remove(); reportProduct(pid); };
+  setTimeout(() => document.addEventListener("click", () => menu.remove(), { once: true }), 0);
 }
 
 /* ---------- 互動：按讚 / 清單 / 檢舉 ---------- */
@@ -404,6 +431,81 @@ async function reportProduct(id) {
   if (!confirm("確定檢舉這則內容嗎？（廣告、重複、非該國商品等）")) return;
   const { error } = await supa.from("reports").insert({ user_id: state.user.id, product_id: id });
   toast(error ? "你已經檢舉過了" : "已收到檢舉，謝謝你！");
+}
+
+/* ---------- 幫忙補圖 ---------- */
+function showPhotoModal(pid) {
+  if (!state.user) return requireLogin();
+  const p = state.byId.get(pid);
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-emoji">📷</div>
+      <h2 class="modal-title">幫「${esc(p?.name_zh || "這個商品")}」補張圖</h2>
+      <p class="modal-sub">選一張清楚的商品照片，通過審核後會顯示在卡片上，你也會 <b>+15 分</b>！<br>（請用實拍或官方圖，別放無關圖片）</p>
+      <label class="photo-pick" id="photoPick">📎 選擇照片<input type="file" accept="image/*" id="photoInput" hidden></label>
+      <div class="photo-preview" id="photoPreview" hidden><img id="photoImg" alt=""></div>
+      <div class="modal-actions">
+        <button class="modal-btn primary" id="photoSend" disabled>送出補圖</button>
+      </div>
+      <button class="modal-close" id="photoClose">取消</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  document.getElementById("photoClose").onclick = close;
+  const input = document.getElementById("photoInput");
+  const sendBtn = document.getElementById("photoSend");
+  let file = null;
+  document.getElementById("photoPick").onclick = () => input.click();
+  input.onchange = () => {
+    const f = input.files[0];
+    if (!f) return;
+    if (!f.type.startsWith("image/")) { toast("請選圖片檔"); return; }
+    if (f.size > 5 * 1024 * 1024) { toast("圖片太大了（上限 5MB）"); return; }
+    file = f;
+    const img = document.getElementById("photoImg");
+    img.src = URL.createObjectURL(f);
+    document.getElementById("photoPreview").hidden = false;
+    document.getElementById("photoPick").textContent = "🔄 重選照片";
+    sendBtn.disabled = false;
+  };
+  sendBtn.onclick = async () => {
+    if (!file) return;
+    sendBtn.disabled = true; sendBtn.textContent = "上傳中…";
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const path = `${pid}/${crypto.randomUUID()}.${ext}`;
+    const up = await supa.storage.from("product-images").upload(path, file, { upsert: false });
+    if (up.error) { sendBtn.disabled = false; sendBtn.textContent = "送出補圖"; toast("上傳失敗：" + up.error.message); return; }
+    const { error } = await supa.from("image_submissions").insert({ product_id: pid, user_id: state.user.id, storage_path: path, status: "pending" });
+    if (error) { sendBtn.disabled = false; sendBtn.textContent = "送出補圖"; toast("送出失敗：" + error.message); return; }
+    close();
+    toast("已送出補圖，等審核通過就會顯示囉！");
+  };
+}
+
+/* ---------- 使用說明 ---------- */
+function showGuideModal() {
+  document.querySelector(".modal-overlay")?.remove();
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-emoji">🧳</div>
+      <h2 class="modal-title">歡迎來到出國購物趣</h2>
+      <p class="modal-sub">三個小功能，讓你出國不再煩惱買什麼：</p>
+      <ul class="guide-list">
+        <li><span>❤️</span><div><b>按讚</b>幫商品加分，讓好物排名往前，被更多人看到。</div></li>
+        <li><span>📍</span><div><b>導航</b>一鍵開 Google 地圖找附近店家。<em>建議先確認營業時間、有沒有貨再去，以免白跑一趟。</em></div></li>
+        <li><span>🧳</span><div><b>加入清單</b>把想買的收起來，出國邊逛邊打勾。</div></li>
+      </ul>
+      <div class="modal-actions"><button class="modal-btn primary" id="guideOk">開始逛逛</button></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => { overlay.remove(); localStorage.setItem("shopfun_guide_seen", "1"); };
+  document.getElementById("guideOk").onclick = close;
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
 }
 
 /* ---------- 我的清單 ---------- */
@@ -632,7 +734,7 @@ function renderProfile() {
   const levelBlock = `
     <div class="level-card">
       <div class="level-top"><span class="level-emoji">${lv.emoji || "🎒"}</span>
-        <div><div class="level-name">${esc(lv.name)}</div><div class="level-sub">貢獻分 ${sc.score}　·　上榜 ${sc.ranked} 樣・獲讚 ${sc.likes} 個</div></div></div>
+        <div><div class="level-name">${esc(lv.name)}</div><div class="level-sub">貢獻分 ${sc.score}　·　上榜 ${sc.ranked}・獲讚 ${sc.likes}・補圖 ${sc.imgs}</div></div></div>
       ${nx ? `<div class="level-bar"><span style="width:${lvProgress}%"></span></div>
         <div class="level-next">再 ${nx.min - sc.score} 分升級 → ${nx.emoji} ${esc(nx.name)}</div>` : `<div class="level-next">🏆 已達最高等級，你就是傳說！</div>`}
     </div>`;
@@ -710,18 +812,20 @@ async function renderNotifications() {
 }
 
 /* ---------- 管理後台 ---------- */
-const ADMIN_TABS = { stats: "📊 數據", reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
-const adm = { products: [], likeCount: new Map(), tab: "stats", search: "", country: "all", loading: false };
+const ADMIN_TABS = { stats: "📊 數據", photos: "📷 補圖審核", reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
+const adm = { products: [], likeCount: new Map(), pending: [], tab: "stats", search: "", country: "all", category: "all", loading: false };
 
 async function loadAdminData() {
-  const [{ data: prods, error: e1 }, { data: likes }] = await Promise.all([
+  const [{ data: prods, error: e1 }, { data: likes }, imgR] = await Promise.all([
     supa.from("products").select("*"),
     supa.from("likes").select("product_id"),
+    supa.from("image_submissions").select("*").eq("status", "pending").order("created_at", { ascending: true }),
   ]);
   if (e1) throw e1;
   adm.likeCount = new Map();
   (likes || []).forEach((l) => adm.likeCount.set(l.product_id, (adm.likeCount.get(l.product_id) || 0) + 1));
   adm.products = (prods || []).map((p) => ({ ...p, like_count: adm.likeCount.get(p.id) || 0 }));
+  adm.pending = imgR.error ? [] : (imgR.data || []); // image_submissions 表未建時忽略
 }
 
 async function renderAdmin() {
@@ -740,10 +844,50 @@ async function renderAdmin() {
     <div class="adm-toolbar" id="admToolbar"></div>
     <div class="adm-list" id="admList"></div>
   </section>`;
-  $app.querySelectorAll("[data-atab]").forEach((b) => b.onclick = () => { adm.tab = b.dataset.atab; renderAdmin(); });
+  $app.querySelectorAll("[data-atab]").forEach((b) => b.onclick = () => { adm.tab = b.dataset.atab; adm.search = ""; adm.country = "all"; adm.category = "all"; renderAdmin(); });
   if (adm.tab === "stats") { renderAdminStats(); }
+  else if (adm.tab === "photos") { document.getElementById("admToolbar").innerHTML = ""; renderAdminPhotos(); }
   else { renderAdminToolbar(); renderAdminList(); }
   window.scrollTo(0, 0);
+}
+
+async function renderAdminPhotos() {
+  const box = document.getElementById("admList");
+  if (!adm.pending.length) { box.innerHTML = `<div class="empty-state"><div class="big">📷</div><p>目前沒有待審的補圖。</p></div>`; return; }
+  box.innerHTML = adm.pending.map((s) => {
+    const p = adm.products.find((x) => x.id === s.product_id);
+    const url = supa.storage.from("product-images").getPublicUrl(s.storage_path).data.publicUrl;
+    const nick = state.nickById.get(s.user_id) || "網友";
+    return `<div class="photo-row">
+      <img class="photo-thumb" src="${esc(url)}" alt="" loading="lazy">
+      <div class="adm-main"><div class="adm-name">${esc(p ? p.name_zh : "（商品已不存在）")}</div><div class="adm-meta">${esc(COUNTRIES[p?.country]?.name || "")} · 由 ${esc(nick)} 補圖</div></div>
+      <div class="adm-actions">
+        <button class="adm-btn ok" data-pact="approve" data-sid="${esc(s.id)}">通過</button>
+        <button class="adm-btn danger" data-pact="reject" data-sid="${esc(s.id)}">退回</button>
+      </div>
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-pact]").forEach((b) => b.onclick = () => photoReview(b.dataset.pact, b.dataset.sid));
+}
+
+async function photoReview(act, sid) {
+  const sub = adm.pending.find((x) => x.id === sid);
+  if (!sub) return;
+  if (act === "approve") {
+    const url = supa.storage.from("product-images").getPublicUrl(sub.storage_path).data.publicUrl;
+    const r1 = await supa.from("image_submissions").update({ status: "approved" }).eq("id", sid).select();
+    if (r1.error || !r1.data?.length) { toast("操作失敗，或沒有權限"); return; }
+    await supa.from("products").update({ image_url: url }).eq("id", sub.product_id);
+    toast("已通過，商品卡會顯示這張圖 ✅");
+  } else {
+    const r1 = await supa.from("image_submissions").update({ status: "rejected" }).eq("id", sid).select();
+    if (r1.error || !r1.data?.length) { toast("操作失敗，或沒有權限"); return; }
+    supa.storage.from("product-images").remove([sub.storage_path]); // 清掉退回的檔（失敗不影響）
+    toast("已退回");
+  }
+  adm.pending = adm.pending.filter((x) => x.id !== sid);
+  state.loaded = false; // 前台重載以顯示新圖
+  renderAdmin();
 }
 
 async function renderAdminStats() {
@@ -766,6 +910,7 @@ async function renderAdminStats() {
 
 function countTab(tab) {
   const P = adm.products;
+  if (tab === "photos") return adm.pending.length;
   if (tab === "reported") return P.filter((p) => p.report_count > 0 && p.status !== "removed").length;
   if (tab === "quar") return P.filter((p) => p.status === "new").length;
   if (tab === "all") return P.filter((p) => p.status === "ranked").length;
@@ -780,6 +925,7 @@ function adminRows() {
   else if (adm.tab === "all") {
     rows = rows.filter((p) => p.status === "ranked");
     if (adm.country !== "all") rows = rows.filter((p) => p.country === adm.country);
+    if (adm.category !== "all") rows = rows.filter((p) => p.category === adm.category);
     if (adm.search) rows = rows.filter((p) => (p.name_zh || "").toLowerCase().includes(adm.search.toLowerCase()));
     rows.sort((a, b) => b.like_count - a.like_count);
   } else if (adm.tab === "removed") rows = rows.filter((p) => p.status === "removed");
@@ -790,12 +936,15 @@ function renderAdminToolbar() {
   const bar = document.getElementById("admToolbar");
   if (adm.tab !== "all") { bar.innerHTML = ""; return; }
   const ctryOpts = `<option value="all">全部國家</option>` + Object.entries(COUNTRIES).map(([c, m]) => `<option value="${c}" ${adm.country === c ? "selected" : ""}>${m.flag} ${m.name}</option>`).join("");
+  const catOpts = Object.entries(CATEGORIES).map(([c, l]) => `<option value="${c}" ${adm.category === c ? "selected" : ""}>${c === "all" ? "全部分類" : l}</option>`).join("");
   bar.innerHTML = `
     <input class="adm-search" id="admSearch" placeholder="🔍 搜尋商品名稱" value="${esc(adm.search)}">
-    <select class="sort-select" id="admCountry">${ctryOpts}</select>`;
+    <select class="sort-select" id="admCountry">${ctryOpts}</select>
+    <select class="sort-select" id="admCategory">${catOpts}</select>`;
   const si = document.getElementById("admSearch");
   si.oninput = () => { adm.search = si.value; renderAdminList(); };
   document.getElementById("admCountry").onchange = (e) => { adm.country = e.target.value; renderAdminList(); };
+  document.getElementById("admCategory").onchange = (e) => { adm.category = e.target.value; renderAdminList(); };
 }
 
 function renderAdminList() {
@@ -810,7 +959,7 @@ function renderAdminList() {
     if (adm.tab === "reported") actions = `<button class="adm-btn danger" data-act="remove" data-id="${esc(p.id)}">下架</button><button class="adm-btn" data-act="clear" data-id="${esc(p.id)}">清除檢舉</button>`;
     else if (adm.tab === "quar") actions = `<button class="adm-btn ok" data-act="promote" data-id="${esc(p.id)}">直接轉正</button><button class="adm-btn danger" data-act="remove" data-id="${esc(p.id)}">下架</button>`;
     else if (adm.tab === "all") actions = `<button class="adm-btn danger" data-act="remove" data-id="${esc(p.id)}">下架</button>`;
-    else if (adm.tab === "removed") actions = `<button class="adm-btn ok" data-act="restore" data-id="${esc(p.id)}">恢復上架</button>`;
+    else if (adm.tab === "removed") actions = `<button class="adm-btn ok" data-act="restore" data-id="${esc(p.id)}">恢復上架</button><button class="adm-btn danger" data-act="purge" data-id="${esc(p.id)}">永久刪除</button>`;
     return `<div class="adm-row">
       <div class="wl-emoji">${esc(p.emoji || "🛍️")}</div>
       <div class="adm-main"><div class="adm-name">${esc(p.name_zh)}</div><div class="adm-meta">${meta}</div></div>
@@ -823,6 +972,17 @@ function renderAdminList() {
 async function adminAction(act, id) {
   const p = adm.products.find((x) => x.id === id);
   if (!p) return;
+  if (act === "purge") {
+    if (!confirm(`永久刪除「${p.name_zh}」？刪除後無法復原。`)) return;
+    if (!confirm(`真的確定嗎？此動作不可逆，連同它的讚、清單、檢舉都會一起清除。`)) return;
+    const { error } = await supa.rpc("admin_purge", { pid: id });
+    if (error) { toast("刪除失敗：" + error.message); return; }
+    adm.products = adm.products.filter((x) => x.id !== id);
+    state.loaded = false;
+    toast("已永久刪除");
+    renderAdmin();
+    return;
+  }
   let patch, msg;
   if (act === "remove") { if (!confirm(`確定下架「${p.name_zh}」？（可從已下架分頁恢復）`)) return; patch = { status: "removed" }; msg = "已下架"; }
   else if (act === "clear") { patch = { report_count: 0 }; msg = "已清除檢舉"; }
@@ -920,6 +1080,7 @@ function showInstallModal() {
 }
 
 window.__login = login;
+window.__guide = showGuideModal; // footer「使用說明」用
 window.addEventListener("hashchange", route);
 
 /* ---------- 啟動 ---------- */
@@ -942,4 +1103,5 @@ window.addEventListener("hashchange", route);
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch((e) => console.warn("SW 註冊失敗：", e.message));
   }
+  if (!localStorage.getItem("shopfun_guide_seen")) setTimeout(showGuideModal, 600); // 首次到訪自動說明
 })();
