@@ -62,6 +62,20 @@ body {
 .logo span { color: var(--accent); }
 
 .topnav { display: flex; gap: 6px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; margin-left: 8px; position: relative; }
+.tb-link { text-decoration: none; color: var(--ink-soft); font-size: 14px; font-weight: 500; padding: 6px 12px; border-radius: 99px; transition: all .18s; white-space: nowrap; }
+.tb-link:hover { background: var(--accent-soft); color: var(--accent-deep); }
+.tb-cta { background: var(--ink); color: #fff; }
+.tb-cta:hover { background: var(--accent); color: #fff; }
+.tb-login { border: 1px solid var(--accent); background: var(--card); color: var(--accent-deep); font-family: var(--sans); font-size: 14px; font-weight: 600; padding: 7px 16px; border-radius: 99px; cursor: pointer; transition: all .18s; }
+.tb-login:hover { background: var(--accent); color: #fff; }
+.tb-user { width: 36px; height: 36px; border-radius: 50%; overflow: hidden; cursor: pointer; border: 2px solid var(--line); background: var(--accent-soft); display: grid; place-items: center; }
+.tb-user img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-fallback { font-weight: 700; color: var(--accent-deep); }
+.tb-menu { position: absolute; top: 46px; right: 0; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow-hover); padding: 12px; min-width: 160px; z-index: 60; }
+.tb-menu-name { font-size: 13px; color: var(--ink-soft); padding: 4px 6px 10px; border-bottom: 1px solid var(--line); margin-bottom: 8px; word-break: break-all; }
+.tb-menu button { width: 100%; border: none; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; padding: 8px; border-radius: 8px; cursor: pointer; }
+.tb-menu button:hover { background: var(--accent-soft); }
 .topnav a {
   text-decoration: none;
   color: var(--ink-soft);
@@ -276,6 +290,10 @@ body {
   box-shadow: var(--shadow-hover);
 }
 .pc-top { display: flex; gap: 14px; align-items: flex-start; }
+.pc-head { flex: 1; min-width: 0; }
+.pc-report { flex: none; border: none; background: transparent; color: var(--ink-faint); font-size: 18px; line-height: 1; padding: 2px 4px; cursor: pointer; border-radius: 8px; align-self: flex-start; }
+.pc-report:hover { background: var(--bg); color: var(--ink-soft); }
+.pc-tag-user { display: inline-block; font-size: 10.5px; font-weight: 600; color: var(--accent-deep); background: var(--accent-soft); padding: 1px 8px; border-radius: 99px; margin-left: 6px; vertical-align: middle; }
 .pc-emoji {
   flex: none;
   width: 56px;
@@ -427,12 +445,96 @@ body {
 }
 
 /* ============ RWD ============ */
+/* ============ 按讚 / 加清單 / 檢疫區進度 ============ */
+.pc-actions { display: flex; gap: 8px; margin-top: 4px; }
+.pc-like {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--card); cursor: pointer;
+  font-family: var(--sans); font-size: 13.5px; font-weight: 700; color: var(--ink-soft);
+  padding: 7px 14px; border-radius: 99px; transition: all .16s;
+}
+.pc-like .heart { font-size: 14px; }
+.pc-like:hover { border-color: var(--accent); }
+.pc-like.on { background: #FCEDE6; border-color: var(--accent); color: var(--accent-deep); }
+.pc-wish {
+  flex: 1; border: 1px solid var(--line); background: var(--card); cursor: pointer;
+  font-family: var(--sans); font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+  padding: 7px 14px; border-radius: 99px; transition: all .16s;
+}
+.pc-wish:hover { border-color: var(--accent); color: var(--accent-deep); }
+.pc-wish.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+.pc-progress { display: flex; align-items: center; gap: 10px; }
+.pc-progress-bar { flex: 1; height: 7px; background: var(--line); border-radius: 99px; overflow: hidden; }
+.pc-progress-bar span { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .3s; }
+.pc-progress-txt { font-size: 11.5px; color: var(--accent-deep); font-weight: 600; white-space: nowrap; }
+
+/* 檢疫區 */
+#quarantine { max-width: 1080px; margin: 0 auto; padding: 0 24px 80px; }
+.quar-head { border-top: 1px dashed var(--line); padding-top: 30px; margin-bottom: 18px; }
+.quar-head h2 { font-family: var(--serif); font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.quar-head p { color: var(--ink-soft); font-size: 14px; margin-top: 4px; }
+
+/* ============ 窄頁（清單／投稿）============ */
+.page-narrow { max-width: 720px; margin: 0 auto; padding: 52px 24px 100px; }
+.page-title { font-family: var(--serif); font-weight: 900; font-size: clamp(26px, 4vw, 34px); letter-spacing: 2px; margin-bottom: 20px; }
+
+/* 我的清單 */
+.wl-group { margin-bottom: 26px; }
+.wl-group-head { display: flex; align-items: baseline; justify-content: space-between; font-weight: 700; font-size: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.wl-group-head span { font-size: 12.5px; color: var(--ink-faint); font-weight: 500; }
+.wl-item { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--line); }
+.wl-item.bought .wl-name { text-decoration: line-through; color: var(--ink-faint); }
+.wl-item.bought .wl-emoji { opacity: .4; }
+.wl-check { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); background: var(--card); color: #fff; cursor: pointer; font-size: 14px; font-weight: 700; display: grid; place-items: center; transition: all .16s; }
+.wl-item.bought .wl-check { background: var(--accent); border-color: var(--accent); }
+.wl-emoji { flex: none; width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-size: 22px; background: var(--accent-soft); }
+.wl-main { flex: 1; min-width: 0; }
+.wl-name { font-weight: 600; font-size: 15px; }
+.wl-meta { font-size: 12px; color: var(--ink-faint); margin-top: 2px; }
+.wl-nav { flex: none; text-decoration: none; font-size: 18px; padding: 4px 8px; border-radius: 8px; }
+.wl-nav:hover { background: var(--bg); }
+.wl-remove { flex: none; border: none; background: transparent; color: var(--ink-faint); font-size: 15px; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
+.wl-remove:hover { background: var(--bg); color: var(--accent); }
+
+/* 投稿表單 */
+.form-note { color: var(--ink-soft); font-size: 13.5px; line-height: 1.7; background: var(--accent-soft); padding: 12px 16px; border-radius: 12px; margin-bottom: 22px; }
+.sub-form { display: flex; flex-direction: column; gap: 16px; }
+.sub-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+.sub-form input, .sub-form select, .sub-form textarea {
+  font-family: var(--sans); font-size: 15px; color: var(--ink); font-weight: 400;
+  border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 11px 14px; width: 100%;
+}
+.sub-form input:focus, .sub-form select:focus, .sub-form textarea:focus { outline: none; border-color: var(--accent); }
+.sub-form textarea { resize: vertical; }
+.sub-btn { margin-top: 4px; border: none; background: var(--accent); color: #fff; font-family: var(--sans); font-size: 16px; font-weight: 700; padding: 13px; border-radius: 12px; cursor: pointer; transition: background .18s; }
+.sub-btn:hover { background: var(--accent-deep); }
+.sub-btn:disabled { opacity: .6; cursor: default; }
+.sub-msg { color: var(--accent-deep); font-size: 14px; text-align: center; min-height: 20px; }
+
+/* Hero CTA */
+.hero-cta { margin-top: 28px; border: none; background: var(--ink); color: #fff; font-family: var(--sans); font-size: 15px; font-weight: 600; padding: 12px 26px; border-radius: 99px; cursor: pointer; transition: all .18s; }
+.hero-cta:hover { background: var(--accent); transform: translateY(-2px); }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; bottom: 32px; transform: translate(-50%, 20px);
+  background: var(--ink); color: #fff; font-size: 14px; font-weight: 500;
+  padding: 12px 22px; border-radius: 99px; box-shadow: var(--shadow-hover);
+  opacity: 0; pointer-events: none; transition: all .28s; z-index: 100; max-width: 90vw; text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ============ RWD ============ */
 @media (max-width: 640px) {
-  .topbar { padding: 12px 18px; }
+  .topbar { padding: 12px 16px; flex-wrap: wrap; gap: 8px; }
+  .topbar-right { margin-left: auto; }
+  .tb-link { padding: 6px 10px; font-size: 13px; }
   .hero { padding: 56px 20px 40px; }
   .toolbar { top: 57px; }
   .toolbar-inner { padding: 10px 18px; }
   .product-grid, .country-grid { padding-left: 18px; padding-right: 18px; }
+  #quarantine { padding-left: 18px; padding-right: 18px; }
   .sort-wrap { width: 100%; }
   .sort-select { flex: 1; }
 }
