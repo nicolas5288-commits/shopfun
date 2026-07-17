@@ -42,6 +42,8 @@ create table reports (
   primary key (user_id, product_id)
 );
 
+-- 注意：此 view 用 select p.* ；若之後對 products 加欄位（如 image_url），
+-- view 不會自動長出新欄位，要 drop view + 重建才會重新展開 p.*。
 create view product_stats
   with (security_invoker = off) as
   select p.*, coalesce(l.cnt,0) as like_count
