@@ -207,8 +207,8 @@ function renderGrid(code) {
       </div>
       <p class="pc-reason">${esc(p.reason)}</p>
       <div class="pc-info">
-        <span class="pc-price"><b>${esc(p.price_local)}</b>｜${esc(p.price_twd)}</span>
-        <span class="pc-stars" title="省錢星級">${stars(p.save_stars)}<span class="pc-stars-label">省錢</span></span>
+        <div class="pc-price"><b>${esc(p.price_local)}</b><span class="pc-twd">${esc(p.price_twd)}</span></div>
+        <div class="pc-stars" title="省錢星級"><span class="pc-stars-label">省錢</span>${stars(p.save_stars)}</div>
       </div>
       <div class="pc-bottom">
         ${(p.where || []).map((w) => `<span class="pc-where">${esc(w)}</span>`).join("")}
