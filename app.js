@@ -11,6 +11,30 @@ const CATEGORIES = { all: "全部", snacks: "零食", beauty: "美妝藥妝", da
 const SORTS = { hot: "🔥 熱門", save: "省錢星級", rank: "必買指數" };
 const PROMOTE_AT = 10; // 檢疫區轉正門檻
 
+// 推薦等級（旅遊里程風）；貢獻分 = 上榜商品×20 + 獲得讚×1
+const LEVELS = [
+  { min: 400, emoji: "👑", name: "出國購物趣傳說" },
+  { min: 150, emoji: "🗺️", name: "環球導購官" },
+  { min: 60, emoji: "🛫", name: "免稅店常客" },
+  { min: 20, emoji: "🧳", name: "行李超重犯" },
+  { min: 1, emoji: "🛒", name: "掃貨見習生" },
+  { min: 0, emoji: "", name: "背包新客" },
+];
+function levelOf(score) { return LEVELS.find((l) => score >= l.min) || LEVELS[LEVELS.length - 1]; }
+function nextLevel(score) { const above = LEVELS.filter((l) => l.min > score); return above.length ? above[above.length - 1] : null; }
+// 依已載入的 products 算某人的貢獻分（獲讚總數 + 上榜數×20）
+function scoreOf(userId) {
+  if (!userId) return { score: 0, likes: 0, ranked: 0 };
+  let likes = 0, ranked = 0;
+  state.byId.forEach((p) => {
+    if (p.submitted_by === userId) {
+      likes += p.like_count || 0;
+      if (p.status === "ranked") ranked += 1;
+    }
+  });
+  return { score: likes + ranked * 20, likes, ranked };
+}
+
 const cfg = window.SHOPFUN_CONFIG || {};
 const supa = (window.supabase && cfg.SUPABASE_URL)
   ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_KEY, {
@@ -171,6 +195,7 @@ function renderRight() {
         <a href="#/notifications" class="tb-mi">🔔 通知中心${state.unread > 0 ? ` <span class="tb-badge">${state.unread}</span>` : ""}</a>
         <a href="#/hot" class="tb-mi">🔥 近期熱門</a>
         <div class="tb-mdiv"></div>
+        ${cfg.COMMUNITY_URL ? `<a href="${esc(cfg.COMMUNITY_URL)}" target="_blank" rel="noopener" class="tb-mi">👥 使用者社群</a>` : ""}
         <a href="${esc(cfg.IG_URL || "#")}" target="_blank" rel="noopener" class="tb-mi">📩 聯繫我們</a>
         ${donateItem}
         <div class="tb-mdiv"></div>
@@ -190,7 +215,7 @@ function renderRight() {
 /* ---------- 首頁 ---------- */
 function renderHome() {
   renderNav(null);
-  document.title = "購物趣｜出國必買好物指南";
+  document.title = "出國購物趣｜出國必買好物指南";
   const cards = Object.entries(COUNTRIES).map(([c, m]) => {
     const count = (state.products[c] || []).filter((p) => p.status !== "new").length;
     return `<a class="country-card" href="#/country/${c}" style="--tint:${m.tint}">
@@ -216,7 +241,7 @@ function renderCountry(code) {
   const meta = COUNTRIES[code];
   if (!meta) return renderHome();
   renderNav(code);
-  document.title = `${meta.name}必買好物｜購物趣`;
+  document.title = `${meta.name}必買好物｜出國購物趣`;
   const catTabs = Object.entries(CATEGORIES).map(([k, l]) => `<button class="cat-tab ${state.cat === k ? "active" : ""}" data-cat="${k}">${l}</button>`).join("");
   const sortOpts = Object.entries(SORTS).map(([k, l]) => `<option value="${k}" ${state.sort === k ? "selected" : ""}>${l}</option>`).join("");
   $app.innerHTML = `
@@ -285,8 +310,9 @@ function productCard(p, rank, opts = {}) {
   const progress = isNew ? Math.min(100, Math.round(((p.like_count || 0) / PROMOTE_AT) * 100)) : 0;
   const rankLabel = rank ? `NO.${String(rank).padStart(2, "0")}　` : "";
   const flagLabel = opts.showCountry && COUNTRIES[p.country] ? `<span class="cat-badge">${COUNTRIES[p.country].flag} ${COUNTRIES[p.country].name}</span>` : "";
+  const submitLv = p.source === "user" ? levelOf(scoreOf(p.submitted_by).score) : null;
   const submitTag = p.source === "user"
-    ? `<span class="pc-tag-user">由 ${esc(state.nickById.get(p.submitted_by) || "網友")} 推薦</span>`
+    ? `<span class="pc-tag-user" ${submitLv && submitLv.emoji ? `title="${esc(submitLv.name)}"` : ""}>由 ${esc(state.nickById.get(p.submitted_by) || "網友")} ${submitLv && submitLv.emoji ? submitLv.emoji : ""}推薦</span>`
     : "";
   return `
     <article class="product-card chip-${esc(p.category)}" data-pid="${esc(p.id)}">
@@ -380,7 +406,7 @@ async function reportProduct(id) {
 /* ---------- 我的清單 ---------- */
 function renderList() {
   renderNav(null);
-  document.title = "我的購物清單｜購物趣";
+  document.title = "我的購物清單｜出國購物趣";
   if (!state.user) {
     $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">🧳 我的購物清單</h1>
       <div class="empty-state"><div class="big">🔒</div><p>登入後就能把想買的好物收進清單，出國邊逛邊打勾。</p>
@@ -429,7 +455,7 @@ async function toggleBought(id) {
 /* ---------- 投稿 ---------- */
 function renderSubmit() {
   renderNav(null);
-  document.title = "推薦好物｜購物趣";
+  document.title = "推薦好物｜出國購物趣";
   if (!state.user) {
     $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">＋ 推薦一樣好物</h1>
       <div class="empty-state"><div class="big">🔒</div><p>登入後就能把你的私藏好物推薦給大家。</p>
@@ -488,15 +514,56 @@ async function submitProduct(e) {
     return;
   }
   state.loaded = false; await loadData(); await loadUserState();
-  toast("🎉 推薦成功！已進入新好物檢疫區");
-  location.hash = `#/country/${rec.country}`;
+  showShareModal(rec.name_zh, rec.country);
+}
+
+/* ---------- 上架成功：一鍵分享衝讚彈窗 ---------- */
+function shareMessage(name, country) {
+  const url = `${location.origin}${location.pathname}#/country/${country}`;
+  return `嘿！我在出國購物趣上架了「${name}」🛒 趕快來按讚讓我通過吧 👉 ${url}`;
+}
+function showShareModal(name, country) {
+  const msg = shareMessage(name, country);
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-emoji">🎉</div>
+      <h2 class="modal-title">上架成功！</h2>
+      <p class="modal-sub">「${esc(name)}」已進入新好物檢疫區。<br>把訊息貼到社群，集滿 ${PROMOTE_AT} 個讚就正式上榜！</p>
+      <div class="modal-msg" id="shareMsg">${esc(msg)}</div>
+      <div class="modal-actions">
+        <button class="modal-btn primary" id="copyBtn">📋 複製訊息</button>
+        ${cfg.COMMUNITY_URL ? `<a class="modal-btn" href="${esc(cfg.COMMUNITY_URL)}" target="_blank" rel="noopener">💬 開啟 LINE 社群</a>` : ""}
+      </div>
+      <button class="modal-close" id="modalClose">稍後再說</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => { overlay.remove(); if (location.hash !== `#/country/${country}`) location.hash = `#/country/${country}`; else route(); };
+  document.getElementById("modalClose").onclick = close;
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  document.getElementById("copyBtn").onclick = async () => {
+    const ok = await copyText(msg);
+    toast(ok ? "已複製，貼到社群衝讚吧！" : "複製失敗，長按訊息手動複製");
+  };
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) {
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      const ok = document.execCommand("copy"); ta.remove(); return ok;
+    } catch (e2) { return false; }
+  }
 }
 
 /* ---------- 🔥 近期熱門 ---------- */
 const hotState = { tab: "week", weekCount: null };
 async function renderHot() {
   renderNav(null);
-  document.title = "近期熱門｜購物趣";
+  document.title = "近期熱門｜出國購物趣";
   $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">🔥 近期熱門</h1>
     <div class="adm-tabs">
       <button class="cat-tab ${hotState.tab === "week" ? "active" : ""}" data-htab="week">近 7 天竄紅</button>
@@ -543,7 +610,7 @@ const AVATAR_EMOJIS = ["😀","😎","🥰","🤩","😴","🧑","👩","🧔","
 const AVATAR_BGS = ["#F3E2D8","#E3D3D8","#D3DBE0","#D5DDD3","#E6DCCB","#EADFF0"];
 function renderProfile() {
   renderNav(null);
-  document.title = "個人設定｜購物趣";
+  document.title = "個人設定｜出國購物趣";
   if (!state.user) {
     $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">👤 個人設定</h1>
       <div class="empty-state"><div class="big">🔒</div><p>登入後就能設定暱稱和頭像。</p>
@@ -555,10 +622,22 @@ function renderProfile() {
   const selBg = cur.avatar_bg || AVATAR_BGS[0];
   const emojiGrid = AVATAR_EMOJIS.map((e) => `<button type="button" class="emoji-opt ${e === selEmoji ? "on" : ""}" data-emoji="${esc(e)}">${e}</button>`).join("");
   const bgGrid = AVATAR_BGS.map((c) => `<button type="button" class="bg-opt ${c === selBg ? "on" : ""}" data-bg="${c}" style="background:${c}"></button>`).join("");
+  const sc = scoreOf(state.user.id);
+  const lv = levelOf(sc.score);
+  const nx = nextLevel(sc.score);
+  const lvProgress = nx ? Math.min(100, Math.round((sc.score / nx.min) * 100)) : 100;
+  const levelBlock = `
+    <div class="level-card">
+      <div class="level-top"><span class="level-emoji">${lv.emoji || "🎒"}</span>
+        <div><div class="level-name">${esc(lv.name)}</div><div class="level-sub">貢獻分 ${sc.score}　·　上榜 ${sc.ranked} 樣・獲讚 ${sc.likes} 個</div></div></div>
+      ${nx ? `<div class="level-bar"><span style="width:${lvProgress}%"></span></div>
+        <div class="level-next">再 ${nx.min - sc.score} 分升級 → ${nx.emoji} ${esc(nx.name)}</div>` : `<div class="level-next">🏆 已達最高等級，你就是傳說！</div>`}
+    </div>`;
   $app.innerHTML = `<section class="page-narrow">
     <h1 class="page-title">👤 個人設定</h1>
     <div class="prof-preview"><span class="avatar-emoji lg" id="profPreview" style="background:${esc(selBg)}">${esc(selEmoji)}</span>
-      <div><div class="prof-preview-name" id="profPreviewName">${esc(cur.nickname || displayName())}</div><div class="prof-preview-sub">你在購物趣的樣子</div></div></div>
+      <div><div class="prof-preview-name" id="profPreviewName">${esc(cur.nickname || displayName())} ${lv.emoji || ""}</div><div class="prof-preview-sub">${esc(lv.name)}</div></div></div>
+    ${levelBlock}
     <form class="sub-form" id="profForm">
       <label>暱稱<input name="nickname" maxlength="20" value="${esc(cur.nickname || "")}" placeholder="給自己取個名字（1-20 字）"></label>
       <div><div class="prof-label">選一個頭像</div><div class="emoji-grid" id="emojiGrid">${emojiGrid}</div></div>
@@ -598,7 +677,7 @@ function renderProfile() {
 /* ---------- 🔔 通知中心 ---------- */
 async function renderNotifications() {
   renderNav(null);
-  document.title = "通知中心｜購物趣";
+  document.title = "通知中心｜出國購物趣";
   if (!state.user) {
     $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">🔔 通知中心</h1>
       <div class="empty-state"><div class="big">🔒</div><p>登入後這裡會顯示你的商品上榜、被下架等通知。</p>
@@ -628,8 +707,8 @@ async function renderNotifications() {
 }
 
 /* ---------- 管理後台 ---------- */
-const ADMIN_TABS = { reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
-const adm = { products: [], likeCount: new Map(), tab: "reported", search: "", country: "all", loading: false };
+const ADMIN_TABS = { stats: "📊 數據", reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
+const adm = { products: [], likeCount: new Map(), tab: "stats", search: "", country: "all", loading: false };
 
 async function loadAdminData() {
   const [{ data: prods, error: e1 }, { data: likes }] = await Promise.all([
@@ -644,7 +723,7 @@ async function loadAdminData() {
 
 async function renderAdmin() {
   renderNav(null);
-  document.title = "管理後台｜購物趣";
+  document.title = "管理後台｜出國購物趣";
   if (!isAdmin()) { toast("沒有管理權限"); location.hash = "#/"; return; }
   $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">⚙️ 管理後台</h1><div class="empty-state"><div class="big">⏳</div><p>載入中…</p></div></section>`;
   try { await loadAdminData(); } catch (e) { $app.querySelector(".empty-state").innerHTML = `<div class="big">⚠️</div><p>載入失敗：${esc(e.message)}</p>`; return; }
@@ -659,9 +738,27 @@ async function renderAdmin() {
     <div class="adm-list" id="admList"></div>
   </section>`;
   $app.querySelectorAll("[data-atab]").forEach((b) => b.onclick = () => { adm.tab = b.dataset.atab; renderAdmin(); });
-  renderAdminToolbar();
-  renderAdminList();
+  if (adm.tab === "stats") { renderAdminStats(); }
+  else { renderAdminToolbar(); renderAdminList(); }
   window.scrollTo(0, 0);
+}
+
+async function renderAdminStats() {
+  const box = document.getElementById("admList");
+  document.getElementById("admToolbar").innerHTML = "";
+  box.innerHTML = `<div class="empty-state"><div class="big">⏳</div><p>載入數據中…</p></div>`;
+  let s;
+  try { const { data, error } = await supa.rpc("admin_stats"); if (error) throw error; s = data; }
+  catch (e) { box.innerHTML = `<div class="empty-state"><div class="big">⚠️</div><p>讀取數據失敗：${esc(e.message)}<br><small>（是否已跑 admin_stats 的 SQL？）</small></p></div>`; return; }
+  const num = (n) => Number(n || 0).toLocaleString();
+  const card = (icon, label, content, sub) => `
+    <div class="stat-card"><div class="stat-label">${icon} ${label}</div><div class="stat-num">${content}</div><div class="stat-sub">${sub}</div></div>`;
+  box.innerHTML = `<div class="stat-grid">
+    ${card("👤", "註冊用戶", num(s.users), `近 7 天 +${num(s.users_7d)}`)}
+    ${card("🛒", "上架商品", num(s.ranked), `含網友投稿 ${num(s.user_submitted)} 樣`)}
+    ${card("❤️", "總按讚數", num(s.likes), `近 7 天 +${num(s.likes_7d)}`)}
+    ${card("⚡", "目前線上", `<span id="statOnline">${onlineCount()}</span>`, "即時在線人數")}
+  </div>`;
 }
 
 function countTab(tab) {
@@ -752,12 +849,30 @@ async function route() {
   else renderHome();
 }
 
+/* ---------- 線上人數（Realtime Presence）---------- */
+let presenceChannel = null;
+function initPresence() {
+  if (!supa || presenceChannel) return;
+  const key = (window.crypto?.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2));
+  presenceChannel = supa.channel("online", { config: { presence: { key } } });
+  presenceChannel.on("presence", { event: "sync" }, () => {
+    const el = document.getElementById("statOnline");
+    if (el) el.textContent = onlineCount();
+  });
+  presenceChannel.subscribe((status) => { if (status === "SUBSCRIBED") presenceChannel.track({ at: Date.now() }); });
+}
+function onlineCount() {
+  if (!presenceChannel) return 0;
+  try { return Object.keys(presenceChannel.presenceState()).length; } catch (e) { return 0; }
+}
+
 window.__login = login;
 window.addEventListener("hashchange", route);
 
 /* ---------- 啟動 ---------- */
 (async function boot() {
   if (supa) {
+    initPresence();
     await refreshUser();
     supa.auth.onAuthStateChange(async (_evt, session) => {
       state.user = session ? session.user : null;

@@ -5,4 +5,5 @@ window.SHOPFUN_CONFIG = {
   ADMIN_EMAIL: "chiwen5288@gmail.com",
   IG_URL: "https://www.instagram.com/nicolas0929_liu/",
   DONATE_URL: "https://portaly.cc/nicolasliu/support",
+  COMMUNITY_URL: "https://line.me/ti/g2/jfkTyLsUtGTzFg2kpSS6HFeTIWuasc0mietV4g?utm_source=invitation&utm_medium=link_copy&utm_campaign=default",
 };
