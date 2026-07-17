@@ -184,6 +184,7 @@ function renderRight() {
   if (state.user) {
     const dot = state.unread > 0 ? `<span class="tb-dot"></span>` : "";
     const donateItem = cfg.DONATE_URL ? `<a href="${esc(cfg.DONATE_URL)}" target="_blank" rel="noopener" class="tb-mi">☕ 小額贊助</a>` : "";
+    const sc = scoreOf(state.user.id); sc.lv = levelOf(sc.score);
     $right.innerHTML = `
       ${isAdmin() ? `<a href="#/admin" class="tb-link tb-admin" title="管理後台">⚙️ 管理</a>` : ""}
       <a href="#/list" class="tb-link" title="我的清單">🧳 清單</a>
@@ -191,10 +192,13 @@ function renderRight() {
       <div class="tb-user" id="tbUser">${avatarHTML()}${dot}</div>
       <div class="tb-menu" id="tbMenu" hidden>
         <div class="tb-menu-name">${esc(displayName())}</div>
+        <a href="#/profile" class="tb-score">${sc.lv.emoji || "🎒"} ${esc(sc.lv.name)} · 貢獻分 ${sc.score}</a>
+        <div class="tb-mdiv"></div>
         <a href="#/profile" class="tb-mi">👤 個人設定</a>
         <a href="#/notifications" class="tb-mi">🔔 通知中心${state.unread > 0 ? ` <span class="tb-badge">${state.unread}</span>` : ""}</a>
         <a href="#/hot" class="tb-mi">🔥 近期熱門</a>
         <div class="tb-mdiv"></div>
+        <button class="tb-mi" id="miInstall">📲 加到主畫面</button>
         ${cfg.COMMUNITY_URL ? `<a href="${esc(cfg.COMMUNITY_URL)}" target="_blank" rel="noopener" class="tb-mi">👥 使用者社群</a>` : ""}
         <a href="${esc(cfg.IG_URL || "#")}" target="_blank" rel="noopener" class="tb-mi">📩 聯繫我們</a>
         ${donateItem}
@@ -204,6 +208,7 @@ function renderRight() {
     const menu = document.getElementById("tbMenu");
     document.getElementById("tbUser").onclick = (e) => { e.stopPropagation(); menu.hidden = !menu.hidden; };
     document.getElementById("btnLogout").onclick = logout;
+    document.getElementById("miInstall").onclick = () => { menu.hidden = true; showInstallModal(); };
     menu.querySelectorAll("a").forEach((a) => a.onclick = () => { menu.hidden = true; });
     document.addEventListener("click", () => { menu.hidden = true; }, { once: true });
   } else {
@@ -866,6 +871,56 @@ function onlineCount() {
   try { return Object.keys(presenceChannel.presenceState()).length; } catch (e) { return 0; }
 }
 
+/* ---------- PWA：加到主畫面 ---------- */
+let deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; });
+function isStandalone() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+function showInstallModal() {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  let body;
+  if (isStandalone()) {
+    body = `<div class="modal-emoji">✅</div><h2 class="modal-title">已經裝好了！</h2>
+      <p class="modal-sub">你正在用 App 模式開啟出國購物趣，畫面乾淨、開啟超快。</p>`;
+  } else if (deferredPrompt) {
+    body = `<div class="modal-emoji">📲</div><h2 class="modal-title">加到主畫面</h2>
+      <p class="modal-sub">裝起來像真的 App：桌面有圖示、全螢幕開啟、開啟秒速。</p>
+      <div class="modal-actions"><button class="modal-btn primary" id="installNow">🚀 立即安裝</button></div>`;
+  } else if (isIOS()) {
+    body = `<div class="modal-emoji">📲</div><h2 class="modal-title">加到 iPhone 主畫面</h2>
+      <p class="modal-sub">用 <b>Safari</b> 開啟本站，照著做只要 3 步：</p>
+      <ol class="install-steps">
+        <li>點畫面最下方的「分享」<span class="ib">􀈂 📤</span></li>
+        <li>往下滑，選「加入主畫面」<span class="ib">➕</span></li>
+        <li>右上角按「加入」就完成！</li>
+      </ol>`;
+  } else {
+    body = `<div class="modal-emoji">📲</div><h2 class="modal-title">加到手機主畫面</h2>
+      <p class="modal-sub">用手機瀏覽器開啟本站，就能像 App 一樣裝到桌面：</p>
+      <ol class="install-steps">
+        <li><b>iPhone</b>：Safari →「分享 📤」→「加入主畫面」</li>
+        <li><b>Android</b>：Chrome 右上「⋮」→「安裝應用程式／加到主畫面」</li>
+      </ol>
+      <div class="modal-msg">${esc(location.origin + location.pathname)}</div>`;
+  }
+  overlay.innerHTML = `<div class="modal">${body}<button class="modal-close" id="installClose">關閉</button></div>`;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.onclick = (e) => { if (e.target === overlay) close(); };
+  document.getElementById("installClose").onclick = close;
+  const now = document.getElementById("installNow");
+  if (now) now.onclick = async () => {
+    close();
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") toast("安裝中… 到主畫面找橘色「趣」圖示！");
+    deferredPrompt = null;
+  };
+}
+
 window.__login = login;
 window.addEventListener("hashchange", route);
 
@@ -884,5 +939,9 @@ window.addEventListener("hashchange", route);
     if (rh && state.user) { sessionStorage.removeItem("returnHash"); if (location.hash !== rh) location.hash = rh; }
   }
   renderRight();
-  await route();
+  await route();          // route() 內 loadData() 完成後，products 才進 state
+  renderRight();          // 再渲染一次，讓選單積分行拿到正確分數（首次 renderRight 時資料還沒到）
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch((e) => console.warn("SW 註冊失敗：", e.message));
+  }
 })();
