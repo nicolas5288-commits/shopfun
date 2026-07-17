@@ -326,7 +326,7 @@ function productCard(p, rank, opts = {}) {
         <div class="pc-head">
           <div class="pc-rank">${rankLabel}${flagLabel}<span class="cat-badge">${CATEGORIES[p.category] || ""}</span>${submitTag}</div>
           <div class="pc-name">${esc(p.name_zh)}</div>
-          ${p.name_local ? `<div class="pc-local">${esc(p.name_local)}</div>` : ""}
+          <div class="pc-local">${p.name_local ? esc(p.name_local) : "&nbsp;"}</div>
         </div>
         <button class="pc-report" data-report="${esc(p.id)}" title="檢舉不當內容">⋯</button>
       </div>
