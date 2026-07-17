@@ -336,15 +336,13 @@ function productCard(p, rank, opts = {}) {
         <div class="pc-stars" title="省錢星級">${p.save_stars ? `<span class="pc-stars-label">省錢</span>${stars(p.save_stars)}` : ""}</div>
       </div>
       ${isNew ? `<div class="pc-progress"><div class="pc-progress-bar"><span style="width:${progress}%"></span></div><span class="pc-progress-txt">還差 ${Math.max(0, PROMOTE_AT - (p.like_count || 0))} 讚上榜</span></div>` : ""}
-      <div class="pc-bottom">
-        ${(p.where || []).map((w) => `<span class="pc-where">${esc(w)}</span>`).join("")}
-        <a class="pc-nav" href="${mapsUrl(p.maps_query)}" target="_blank" rel="noopener">📍 導航</a>
-      </div>
+      ${(p.where || []).length ? `<div class="pc-bottom">${(p.where || []).map((w) => `<span class="pc-where">${esc(w)}</span>`).join("")}</div>` : ""}
       <div class="pc-actions">
         <button class="pc-like ${liked ? "on" : ""}" data-like="${esc(p.id)}">
           <span class="heart">${liked ? "❤️" : "🤍"}</span><span class="lc">${p.like_count || 0}</span>
         </button>
         <button class="pc-wish ${inList ? "on" : ""}" data-wish="${esc(p.id)}">${inList ? "✓ 在清單" : "＋ 加入清單"}</button>
+        <a class="pc-nav" href="${mapsUrl(p.maps_query)}" target="_blank" rel="noopener">📍 導航</a>
       </div>
     </article>`;
 }
