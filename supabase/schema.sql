@@ -83,7 +83,7 @@ alter table wishlist enable row level security;
 alter table reports enable row level security;
 create policy p_read on products for select using (true);
 create policy p_insert on products for insert with check (auth.uid() = submitted_by and source='user' and status='new');
-create policy p_admin on products for update using (auth.jwt()->>'email' = '4gpt4used@gmail.com');
+create policy p_admin on products for update using (auth.jwt()->>'email' = 'chiwen5288@gmail.com');
 create policy l_read on likes for select using (true);
 create policy l_ins on likes for insert with check (auth.uid() = user_id);
 create policy l_del on likes for delete using (auth.uid() = user_id);

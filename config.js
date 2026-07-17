@@ -2,5 +2,5 @@
 window.SHOPFUN_CONFIG = {
   SUPABASE_URL: "https://nplneyuyosrtozkfcadi.supabase.co",
   SUPABASE_KEY: "sb_publishable_xlQul7ZjWhxr2ELuyRE5yg_4I9COBOI",
-  ADMIN_EMAIL: "4gpt4used@gmail.com",
+  ADMIN_EMAIL: "chiwen5288@gmail.com",
 };
