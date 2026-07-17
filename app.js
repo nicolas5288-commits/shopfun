@@ -133,6 +133,7 @@ function renderRight() {
       ? `<img src="${esc(u.user_metadata.avatar_url)}" alt="" referrerpolicy="no-referrer">`
       : `<span class="avatar-fallback">${esc(name[0] || "我")}</span>`;
     $right.innerHTML = `
+      ${isAdmin() ? `<a href="#/admin" class="tb-link tb-admin" title="管理後台">⚙️ 管理</a>` : ""}
       <a href="#/list" class="tb-link" title="我的清單">🧳 清單</a>
       <a href="#/submit" class="tb-link tb-cta">＋ 推好物</a>
       <div class="tb-user" id="tbUser">${avatar}</div>
@@ -451,12 +452,123 @@ async function submitProduct(e) {
   location.hash = `#/country/${rec.country}`;
 }
 
+/* ---------- 管理後台 ---------- */
+const ADMIN_TABS = { reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
+const adm = { products: [], likeCount: new Map(), tab: "reported", search: "", country: "all", loading: false };
+
+async function loadAdminData() {
+  const [{ data: prods, error: e1 }, { data: likes }] = await Promise.all([
+    supa.from("products").select("*"),
+    supa.from("likes").select("product_id"),
+  ]);
+  if (e1) throw e1;
+  adm.likeCount = new Map();
+  (likes || []).forEach((l) => adm.likeCount.set(l.product_id, (adm.likeCount.get(l.product_id) || 0) + 1));
+  adm.products = (prods || []).map((p) => ({ ...p, like_count: adm.likeCount.get(p.id) || 0 }));
+}
+
+async function renderAdmin() {
+  renderNav(null);
+  document.title = "管理後台｜購物趣";
+  if (!isAdmin()) { toast("沒有管理權限"); location.hash = "#/"; return; }
+  $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">⚙️ 管理後台</h1><div class="empty-state"><div class="big">⏳</div><p>載入中…</p></div></section>`;
+  try { await loadAdminData(); } catch (e) { $app.querySelector(".empty-state").innerHTML = `<div class="big">⚠️</div><p>載入失敗：${esc(e.message)}</p>`; return; }
+  const tabs = Object.entries(ADMIN_TABS).map(([k, l]) => {
+    const n = countTab(k);
+    return `<button class="cat-tab ${adm.tab === k ? "active" : ""}" data-atab="${k}">${l}${n ? ` <span class="adm-count">${n}</span>` : ""}</button>`;
+  }).join("");
+  $app.innerHTML = `<section class="page-narrow">
+    <h1 class="page-title">⚙️ 管理後台</h1>
+    <div class="adm-tabs">${tabs}</div>
+    <div class="adm-toolbar" id="admToolbar"></div>
+    <div class="adm-list" id="admList"></div>
+  </section>`;
+  $app.querySelectorAll("[data-atab]").forEach((b) => b.onclick = () => { adm.tab = b.dataset.atab; renderAdmin(); });
+  renderAdminToolbar();
+  renderAdminList();
+  window.scrollTo(0, 0);
+}
+
+function countTab(tab) {
+  const P = adm.products;
+  if (tab === "reported") return P.filter((p) => p.report_count > 0 && p.status !== "removed").length;
+  if (tab === "quar") return P.filter((p) => p.status === "new").length;
+  if (tab === "all") return P.filter((p) => p.status === "ranked").length;
+  if (tab === "removed") return P.filter((p) => p.status === "removed").length;
+  return 0;
+}
+
+function adminRows() {
+  let rows = [...adm.products];
+  if (adm.tab === "reported") rows = rows.filter((p) => p.report_count > 0 && p.status !== "removed").sort((a, b) => b.report_count - a.report_count);
+  else if (adm.tab === "quar") rows = rows.filter((p) => p.status === "new").sort((a, b) => (b.like_count - a.like_count) || (new Date(b.created_at) - new Date(a.created_at)));
+  else if (adm.tab === "all") {
+    rows = rows.filter((p) => p.status === "ranked");
+    if (adm.country !== "all") rows = rows.filter((p) => p.country === adm.country);
+    if (adm.search) rows = rows.filter((p) => (p.name_zh || "").toLowerCase().includes(adm.search.toLowerCase()));
+    rows.sort((a, b) => b.like_count - a.like_count);
+  } else if (adm.tab === "removed") rows = rows.filter((p) => p.status === "removed");
+  return rows;
+}
+
+function renderAdminToolbar() {
+  const bar = document.getElementById("admToolbar");
+  if (adm.tab !== "all") { bar.innerHTML = ""; return; }
+  const ctryOpts = `<option value="all">全部國家</option>` + Object.entries(COUNTRIES).map(([c, m]) => `<option value="${c}" ${adm.country === c ? "selected" : ""}>${m.flag} ${m.name}</option>`).join("");
+  bar.innerHTML = `
+    <input class="adm-search" id="admSearch" placeholder="🔍 搜尋商品名稱" value="${esc(adm.search)}">
+    <select class="sort-select" id="admCountry">${ctryOpts}</select>`;
+  const si = document.getElementById("admSearch");
+  si.oninput = () => { adm.search = si.value; renderAdminList(); };
+  document.getElementById("admCountry").onchange = (e) => { adm.country = e.target.value; renderAdminList(); };
+}
+
+function renderAdminList() {
+  const box = document.getElementById("admList");
+  const rows = adminRows();
+  if (!rows.length) { box.innerHTML = `<div class="empty-state"><div class="big">✨</div><p>這個分頁沒有東西，很乾淨！</p></div>`; return; }
+  box.innerHTML = rows.map((p) => {
+    const m = COUNTRIES[p.country] || {};
+    const date = p.created_at ? new Date(p.created_at).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" }) : "";
+    const meta = `${m.flag || ""} ${CATEGORIES[p.category] || ""}　❤️ ${p.like_count}${p.report_count ? `　🚨 ${p.report_count}` : ""}${date ? `　${date}` : ""}${p.source === "user" ? "　網友" : ""}`;
+    let actions = "";
+    if (adm.tab === "reported") actions = `<button class="adm-btn danger" data-act="remove" data-id="${esc(p.id)}">下架</button><button class="adm-btn" data-act="clear" data-id="${esc(p.id)}">清除檢舉</button>`;
+    else if (adm.tab === "quar") actions = `<button class="adm-btn ok" data-act="promote" data-id="${esc(p.id)}">直接轉正</button><button class="adm-btn danger" data-act="remove" data-id="${esc(p.id)}">下架</button>`;
+    else if (adm.tab === "all") actions = `<button class="adm-btn danger" data-act="remove" data-id="${esc(p.id)}">下架</button>`;
+    else if (adm.tab === "removed") actions = `<button class="adm-btn ok" data-act="restore" data-id="${esc(p.id)}">恢復上架</button>`;
+    return `<div class="adm-row">
+      <div class="wl-emoji">${esc(p.emoji || "🛍️")}</div>
+      <div class="adm-main"><div class="adm-name">${esc(p.name_zh)}</div><div class="adm-meta">${meta}</div></div>
+      <div class="adm-actions">${actions}</div>
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-act]").forEach((b) => b.onclick = () => adminAction(b.dataset.act, b.dataset.id));
+}
+
+async function adminAction(act, id) {
+  const p = adm.products.find((x) => x.id === id);
+  if (!p) return;
+  let patch, msg;
+  if (act === "remove") { if (!confirm(`確定下架「${p.name_zh}」？（可從已下架分頁恢復）`)) return; patch = { status: "removed" }; msg = "已下架"; }
+  else if (act === "clear") { patch = { report_count: 0 }; msg = "已清除檢舉"; }
+  else if (act === "promote") { patch = { status: "ranked" }; msg = "已轉正上榜 🎉"; }
+  else if (act === "restore") { const st = (p.source === "seed" || p.like_count >= PROMOTE_AT) ? "ranked" : "new"; patch = { status: st }; msg = st === "ranked" ? "已恢復上架" : "已送回檢疫區"; }
+  const { data, error } = await supa.from("products").update(patch).eq("id", id).select();
+  if (error) { toast("操作失敗：" + error.message); return; }
+  if (!data || !data.length) { toast("沒有權限，或該筆已被異動"); return; }
+  Object.assign(p, patch);
+  state.loaded = false; // 讓前台頁面下次重載
+  toast(msg);
+  renderAdmin();
+}
+
 /* ---------- Router ---------- */
 async function route() {
   await loadData();
   const hash = location.hash || "#/";
   let m;
   if ((m = hash.match(/^#\/country\/(\w+)/))) { state.cat = "all"; renderCountry(m[1]); }
+  else if (hash.startsWith("#/admin")) renderAdmin();
   else if (hash.startsWith("#/list")) renderList();
   else if (hash.startsWith("#/submit")) renderSubmit();
   else renderHome();
