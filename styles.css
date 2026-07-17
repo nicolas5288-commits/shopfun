@@ -323,7 +323,6 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 2.9em; /* 固定 2 行高，讓下方價格框對齊 */
 }
 .pc-local {
   color: var(--ink-faint);
