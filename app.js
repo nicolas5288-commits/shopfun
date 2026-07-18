@@ -536,16 +536,37 @@ function showPhotoModal(pid) {
   };
   sendBtn.onclick = async () => {
     if (!file) return;
-    sendBtn.disabled = true; sendBtn.textContent = "上傳中…";
-    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const path = `${pid}/${crypto.randomUUID()}.${ext}`;
-    const up = await supa.storage.from("product-images").upload(path, file, { upsert: false });
+    sendBtn.disabled = true; sendBtn.textContent = "處理中…";
+    const blob = await compressImage(file);           // 上傳前縮到 1200px JPEG（省儲存空間）
+    sendBtn.textContent = "上傳中…";
+    const path = `${pid}/${crypto.randomUUID()}.jpg`;
+    const up = await supa.storage.from("product-images").upload(path, blob, { upsert: false, contentType: "image/jpeg" });
     if (up.error) { sendBtn.disabled = false; sendBtn.textContent = "送出補圖"; toast("上傳失敗：" + up.error.message); return; }
     const { error } = await supa.from("image_submissions").insert({ product_id: pid, user_id: state.user.id, storage_path: path, status: "pending" });
     if (error) { sendBtn.disabled = false; sendBtn.textContent = "送出補圖"; toast("送出失敗：" + error.message); return; }
     close();
     toast("已送出補圖，等審核通過就會顯示囉！");
   };
+}
+// 瀏覽器端壓縮：縮到最長邊 1200px、JPEG 0.8（3-5MB → ~200KB）；失敗則退回原檔
+function compressImage(file, maxSide = 1200, quality = 0.8) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (Math.max(width, height) > maxSide) {
+        const s = maxSide / Math.max(width, height);
+        width = Math.round(width * s); height = Math.round(height * s);
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob((b) => resolve(b || file), "image/jpeg", quality);
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => resolve(file);
+    img.src = URL.createObjectURL(file);
+  });
 }
 
 /* ---------- 使用說明 ---------- */
