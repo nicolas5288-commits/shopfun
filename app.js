@@ -508,7 +508,7 @@ function showPhotoModal(pid) {
     <div class="modal">
       <div class="modal-emoji">📷</div>
       <h2 class="modal-title">幫「${esc(p?.name_zh || "這個商品")}」補張圖</h2>
-      <p class="modal-sub">選一張清楚的商品照片，通過審核後會顯示在卡片上，你也會 <b>+15 分</b>！<br>（請用實拍或官方圖，別放無關圖片）</p>
+      <p class="modal-sub">選一張清楚的商品照片，通過審核後會顯示在卡片上，你也會 <b>+15 分</b>！<br>📸 商品置中、背景乾淨的照片最容易通過審核（會自動裁成正方形）</p>
       <label class="photo-pick" id="photoPick">📎 選擇照片<input type="file" accept="image/*" id="photoInput" hidden></label>
       <div class="photo-preview" id="photoPreview" hidden><img id="photoImg" alt=""></div>
       <div class="modal-actions">
@@ -550,19 +550,17 @@ function showPhotoModal(pid) {
     toast("已送出補圖，等審核通過就會顯示囉！");
   };
 }
-// 瀏覽器端壓縮：縮到最長邊 1200px、JPEG 0.8（3-5MB → ~200KB）；失敗則退回原檔
-function compressImage(file, maxSide = 1200, quality = 0.8) {
+// 瀏覽器端處理：置中裁 1:1 正方形 → 縮到 800×800 → JPEG 0.8（統一比例、省空間）；失敗退回原檔
+function compressImage(file, size = 800, quality = 0.8) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
-      let { width, height } = img;
-      if (Math.max(width, height) > maxSide) {
-        const s = maxSide / Math.max(width, height);
-        width = Math.round(width * s); height = Math.round(height * s);
-      }
+      const side = Math.min(img.width, img.height);        // 取短邊為正方形邊長
+      const sx = (img.width - side) / 2, sy = (img.height - side) / 2; // 置中裁切
+      const out = Math.min(size, side);                    // 不放大小圖
       const canvas = document.createElement("canvas");
-      canvas.width = width; canvas.height = height;
-      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.width = out; canvas.height = out;
+      canvas.getContext("2d").drawImage(img, sx, sy, side, side, 0, 0, out, out);
       canvas.toBlob((b) => resolve(b || file), "image/jpeg", quality);
       URL.revokeObjectURL(img.src);
     };
