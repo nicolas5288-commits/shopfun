@@ -184,7 +184,7 @@ function renderNav(active) {
   const countries = Object.entries(COUNTRIES)
     .map(([c, m]) => `<a href="#/country/${c}" class="${active === c ? "active" : ""}">${m.flag} ${m.name}</a>`)
     .join("");
-  $nav.innerHTML = `${countries}<a href="#/hot" class="${active === "hot" ? "active" : ""}">🔥 熱門</a><button class="nav-search" id="navSearch" title="搜尋商品">🔍</button>`;
+  $nav.innerHTML = `${countries}<a href="#/hot" class="${active === "hot" ? "active" : ""}">🔥 熱門</a><button class="nav-search" id="navSearch" title="搜尋商品">🔍 快速搜尋</button>`;
   document.getElementById("navSearch").onclick = showSearch;
 }
 function renderRight() {

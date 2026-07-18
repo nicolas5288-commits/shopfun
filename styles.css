@@ -551,8 +551,9 @@ body {
 .adm-btn.ok:hover { background: var(--accent); border-color: var(--accent); }
 
 /* ============ 頂欄搜尋＋首頁熱門 V2.8 ============ */
-.nav-search { border: none; background: transparent; cursor: pointer; font-size: 16px; padding: 6px 10px; border-radius: 99px; line-height: 1; }
-.nav-search:hover { background: var(--accent-soft); }
+.nav-search { border: 1px solid var(--line); background: var(--card); color: var(--ink-soft); cursor: pointer; font-family: var(--sans); font-size: 14px; font-weight: 500; padding: 6px 14px; border-radius: 99px; line-height: 1.4; white-space: nowrap; transition: all .18s; }
+.nav-search:hover { background: var(--accent-soft); color: var(--accent-deep); border-color: var(--accent); }
+@media (max-width: 640px) { .nav-search { padding: 6px 10px; font-size: 13.5px; } }
 
 .search-overlay { align-items: flex-start; }
 .search-box { background: var(--card); width: 100%; max-width: 640px; margin-top: 8vh; border-radius: 18px; box-shadow: var(--shadow-hover); overflow: hidden; display: flex; flex-direction: column; max-height: 82vh; animation: popIn .2s; }
