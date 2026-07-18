@@ -528,6 +528,8 @@ body {
 .form-note { color: var(--ink-soft); font-size: 13.5px; line-height: 1.7; background: var(--accent-soft); padding: 12px 16px; border-radius: 12px; margin-bottom: 22px; }
 .sub-form { display: flex; flex-direction: column; gap: 16px; }
 .sub-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+.char-count { position: absolute; right: 0; font-size: 12px; font-weight: 500; color: var(--ink-faint); }
+.sub-form label:has(.char-count) { position: relative; }
 .sub-form input, .sub-form select, .sub-form textarea {
   font-family: var(--sans); font-size: 15px; color: var(--ink); font-weight: 400;
   border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 11px 14px; width: 100%;

@@ -403,7 +403,7 @@ function productCard(p, rank, opts = {}) {
         </div>
         <button class="pc-report" data-menu="${esc(p.id)}" title="更多">⋯</button>
       </div>
-      <p class="pc-reason">${esc(p.reason)}</p>
+      <p class="pc-reason">${esc(p.reason || "")}</p>
       <div class="pc-info">
         <div class="pc-price"><b>${esc(p.price_local || "—")}</b>${p.price_twd ? `<span class="pc-twd">${esc(p.price_twd)}</span>` : ""}</div>
         <div class="pc-stars" title="省錢星級">${p.save_stars ? `<span class="pc-stars-label">省錢</span>${stars(p.save_stars)}` : ""}</div>
@@ -646,13 +646,17 @@ function renderSubmit() {
       </label>
       <label>哪裡買（用頓號分隔，選填）<input name="where" maxlength="60" placeholder="例：唐吉訶德、藥妝店"></label>
       <label>Google Maps 導航關鍵字<input name="maps_query" required maxlength="60" placeholder="當地店名最準，例：ドン・キホーテ"></label>
-      <label>推薦理由（至少 15 字）<textarea name="reason" required minlength="15" maxlength="120" rows="3" placeholder="為什麼值得買？口感、價差、限定…講重點"></textarea></label>
+      <label>推薦理由（選填，最多 20 字）<span class="char-count" id="reasonCount">0/20</span><textarea name="reason" maxlength="20" rows="2" placeholder="寫一句為什麼值得買，更容易被按讚！"></textarea></label>
       <label>代表 Emoji（選填）<input name="emoji" maxlength="4" placeholder="🍟"></label>
       <button type="submit" class="sub-btn">送出推薦</button>
       <div class="sub-msg" id="subMsg"></div>
     </form>
   </section>`;
-  document.getElementById("subForm").addEventListener("submit", submitProduct);
+  const form = document.getElementById("subForm");
+  form.addEventListener("submit", submitProduct);
+  const ta = form.elements["reason"];
+  const cc = document.getElementById("reasonCount");
+  ta.addEventListener("input", () => { cc.textContent = `${ta.value.length}/20`; });
   window.scrollTo(0, 0);
 }
 async function submitProduct(e) {
@@ -666,11 +670,10 @@ async function submitProduct(e) {
     price_local: g("price_local") || null,
     save_stars: parseInt(g("save_stars"), 10),
     where: g("where") ? g("where").split(/[、,，]/).map((s) => s.trim()).filter(Boolean) : [],
-    maps_query: g("maps_query"), reason: g("reason"),
+    maps_query: g("maps_query"), reason: g("reason") || null,
     emoji: g("emoji") || "🛍️",
     source: "user", status: "new", submitted_by: state.user.id,
   };
-  if (rec.reason.length < 15) { msg.textContent = "推薦理由至少 15 字唷。"; return; }
   // 防重複：同國家相似名稱
   const { data: dup } = await supa.from("products").select("name_zh").eq("country", rec.country).ilike("name_zh", `%${rec.name_zh}%`).limit(1);
   if (dup && dup.length) { msg.innerHTML = `「${esc(dup[0].name_zh)}」好像已經有人推過囉，先去按個讚吧！`; return; }
@@ -829,6 +832,9 @@ function renderProfile() {
   document.getElementById("profForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const nickname = nameInput.value.trim() || null;
+    if (nickname && /管理員|官方|admin|購物趣|客服/i.test(nickname)) {
+      document.getElementById("profMsg").textContent = "這個暱稱含保留字（如管理員/官方），換一個吧～"; return;
+    }
     const rec = { user_id: state.user.id, nickname, avatar_emoji: pick.emoji, avatar_bg: pick.bg, updated_at: new Date().toISOString() };
     const btn = e.target.querySelector(".sub-btn"); btn.disabled = true; btn.textContent = "儲存中…";
     const { error } = await supa.from("profiles").upsert(rec);
