@@ -81,6 +81,7 @@ body {
 .install-steps .ib { display: inline-block; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 0 6px; margin-left: 4px; font-size: 13px; }
 .tb-menu button { width: 100%; border: none; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; padding: 8px; border-radius: 8px; cursor: pointer; }
 .tb-menu button:hover { background: var(--accent-soft); }
+.topnav { flex-wrap: wrap; align-items: center; }
 .topnav a {
   text-decoration: none;
   color: var(--ink-soft);
@@ -89,9 +90,11 @@ body {
   padding: 6px 14px;
   border-radius: 99px;
   transition: all .2s;
+  white-space: nowrap;
 }
 .topnav a:hover { background: var(--accent-soft); color: var(--accent-deep); }
 .topnav a.active { background: var(--ink); color: #fff; }
+@media (max-width: 640px) { .topnav { gap: 2px; } .topnav a { padding: 6px 9px; font-size: 13.5px; } }
 
 /* ============ 首頁 Hero ============ */
 .hero {
@@ -546,6 +549,31 @@ body {
 .adm-btn.danger:hover { background: #FBEBE4; border-color: var(--accent); color: var(--accent-deep); }
 .adm-btn.ok { background: var(--ink); border-color: var(--ink); color: #fff; }
 .adm-btn.ok:hover { background: var(--accent); border-color: var(--accent); }
+
+/* ============ 頂欄搜尋＋首頁熱門 V2.8 ============ */
+.nav-search { border: none; background: transparent; cursor: pointer; font-size: 16px; padding: 6px 10px; border-radius: 99px; line-height: 1; }
+.nav-search:hover { background: var(--accent-soft); }
+
+.search-overlay { align-items: flex-start; }
+.search-box { background: var(--card); width: 100%; max-width: 640px; margin-top: 8vh; border-radius: 18px; box-shadow: var(--shadow-hover); overflow: hidden; display: flex; flex-direction: column; max-height: 82vh; animation: popIn .2s; }
+.search-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.search-ico { font-size: 18px; }
+.search-input { flex: 1; border: none; outline: none; background: transparent; font-family: var(--sans); font-size: 17px; color: var(--ink); }
+.search-close { border: none; background: var(--bg); color: var(--ink-soft); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; }
+.search-close:hover { background: var(--accent-soft); color: var(--accent-deep); }
+.search-results { overflow-y: auto; padding: 16px; }
+.search-results .product-grid { padding: 0; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+.search-hint { text-align: center; color: var(--ink-faint); padding: 48px 20px; line-height: 1.8; }
+.search-hint a { color: var(--accent-deep); font-weight: 600; }
+
+.home-hot { max-width: 1080px; margin: 0 auto; padding: 0 24px 8px; }
+.home-hot:empty { display: none; }
+.home-hot-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px; }
+.home-hot-head h2 { font-family: var(--serif); font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+.home-hot-head a { color: var(--accent-deep); font-weight: 600; font-size: 14px; text-decoration: none; white-space: nowrap; }
+.home-hot-head a:hover { text-decoration: underline; }
+.home-hot .product-grid { padding: 0; }
+@media (max-width: 640px) { .home-hot { padding-left: 18px; padding-right: 18px; } .search-box { margin-top: 0; max-height: 100vh; border-radius: 0; height: 100%; } .search-overlay { padding: 0; } }
 
 /* ============ 卡片 ⋯ 選單 / 補圖 / 說明 V2.6-2.7 ============ */
 .card-menu { position: absolute; z-index: 120; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow-hover); padding: 6px; display: flex; flex-direction: column; min-width: 140px; }

@@ -9,7 +9,7 @@ const SEED_FILE = { jp: "data/seed_jp.json", kr: "data/seed_kr.json", th: "data/
 
 const CATEGORIES = { all: "全部", snacks: "零食", beauty: "美妝藥妝", daily: "生活小物", health: "藥品保健", souvenir: "伴手禮" };
 const SORTS = { hot: "🔥 熱門", save: "省錢星級", rank: "必買指數" };
-const PROMOTE_AT = 10; // 檢疫區轉正門檻
+const PROMOTE_AT = 3; // 檢疫區轉正門檻（同步：DB promote_product 觸發器也要 >= 這個數）
 
 // 推薦等級（旅遊里程風）；貢獻分 = 上榜商品×20 + 獲得讚×1
 const LEVELS = [
@@ -181,9 +181,11 @@ function avatarHTML() {
 
 /* ---------- 頂欄 ---------- */
 function renderNav(active) {
-  $nav.innerHTML = Object.entries(COUNTRIES)
+  const countries = Object.entries(COUNTRIES)
     .map(([c, m]) => `<a href="#/country/${c}" class="${active === c ? "active" : ""}">${m.flag} ${m.name}</a>`)
     .join("");
+  $nav.innerHTML = `${countries}<a href="#/hot" class="${active === "hot" ? "active" : ""}">🔥 熱門</a><button class="nav-search" id="navSearch" title="搜尋商品">🔍</button>`;
+  document.getElementById("navSearch").onclick = showSearch;
 }
 function renderRight() {
   if (!supa) { $right.innerHTML = ""; return; }
@@ -245,8 +247,69 @@ function renderHome() {
       <p>必買好物 × 省錢星級 × 一鍵導航到最近的店</p>
       ${state.user ? "" : `<button class="hero-cta" onclick="__login()">用 Google 登入，把好物按上榜</button>`}
     </section>
+    <section class="home-hot" id="homeHot"></section>
     <section class="country-grid">${cards}</section>`;
+  renderHomeHot();
   window.scrollTo(0, 0);
+}
+
+async function renderHomeHot() {
+  const box = document.getElementById("homeHot");
+  if (!box) return;
+  if (!hotState.weekCount) await loadWeekCounts();
+  if (!document.getElementById("homeHot")) return; // 期間可能已換頁
+  const items = Object.values(state.products).flat().filter((p) => p.status === "ranked");
+  let hot = items.map((p) => ({ p, n: hotState.weekCount.get(p.id) || 0 })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n).map((x) => x.p);
+  if (hot.length < 6) {
+    const extra = items.filter((p) => !hot.includes(p)).sort((a, b) => (b.like_count || 0) - (a.like_count || 0));
+    hot = hot.concat(extra);
+  }
+  hot = hot.slice(0, 6);
+  if (!hot.length) { box.innerHTML = ""; return; }
+  box.innerHTML = `
+    <div class="home-hot-head"><h2>🔥 本週熱門</h2><a href="#/hot">看完整榜單 →</a></div>
+    <div class="product-grid">${hot.map((p) => productCard(p, null, { showCountry: true })).join("")}</div>`;
+  bindCardEvents(box);
+}
+
+/* ---------- 前台搜尋 ---------- */
+function showSearch() {
+  document.querySelector(".search-overlay")?.remove();
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay search-overlay";
+  overlay.innerHTML = `
+    <div class="search-box" onclick="event.stopPropagation()">
+      <div class="search-head">
+        <span class="search-ico">🔍</span>
+        <input id="searchInput" class="search-input" placeholder="搜商品名：EVE、面膜、海苔…" autocomplete="off">
+        <button class="search-close" id="searchClose">✕</button>
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const input = document.getElementById("searchInput");
+  const results = document.getElementById("searchResults");
+  const close = () => { overlay.remove(); document.removeEventListener("keydown", onEsc); };
+  function onEsc(e) { if (e.key === "Escape") close(); }
+  document.getElementById("searchClose").onclick = close;
+  overlay.onclick = close;
+  document.addEventListener("keydown", onEsc);
+  const render = () => {
+    const q = input.value.trim().toLowerCase();
+    if (!q) { results.innerHTML = `<div class="search-hint">輸入商品名試試：EVE、面膜、海苔…</div>`; return; }
+    const all = Object.values(state.products).flat().filter((p) => p.status === "ranked");
+    const hits = all.filter((p) => [p.name_zh || "", p.name_local || "", ...(p.where || [])].join(" ").toLowerCase().includes(q)).slice(0, 30);
+    if (!hits.length) {
+      results.innerHTML = `<div class="search-hint">找不到「${esc(input.value.trim())}」😢<br><a href="#/submit" class="search-sub">要不要幫大家推薦這個好物？</a></div>`;
+      results.querySelector(".search-sub").onclick = close;
+      return;
+    }
+    results.innerHTML = `<div class="product-grid">${hits.map((p) => productCard(p, null, { showCountry: true })).join("")}</div>`;
+    bindCardEvents(results);
+  };
+  input.oninput = render;
+  render();
+  setTimeout(() => input.focus(), 50);
 }
 
 /* ---------- 國家頁 ---------- */
@@ -667,7 +730,7 @@ async function copyText(text) {
 /* ---------- 🔥 近期熱門 ---------- */
 const hotState = { tab: "week", weekCount: null };
 async function renderHot() {
-  renderNav(null);
+  renderNav("hot");
   document.title = "近期熱門｜出國購物趣";
   $app.innerHTML = `<section class="page-narrow"><h1 class="page-title">🔥 近期熱門</h1>
     <div class="adm-tabs">
