@@ -508,7 +508,7 @@ function showPhotoModal(pid) {
     <div class="modal">
       <div class="modal-emoji">📷</div>
       <h2 class="modal-title">幫「${esc(p?.name_zh || "這個商品")}」補張圖</h2>
-      <p class="modal-sub">選一張清楚的商品照片，通過審核後會顯示在卡片上，你也會 <b>+15 分</b>！<br>📸 商品置中、背景乾淨的照片最容易通過審核（會自動裁成正方形）</p>
+      <p class="modal-sub">選一張清楚的商品照片，通過審核後會顯示在卡片上，你也會 <b>+15 分</b>！<br>📸 建議上傳<b>白底商品照</b>（官網圖或乾淨背景實拍）最容易通過審核，會自動裁成正方形</p>
       <label class="photo-pick" id="photoPick">📎 選擇照片<input type="file" accept="image/*" id="photoInput" hidden></label>
       <div class="photo-preview" id="photoPreview" hidden><img id="photoImg" alt=""></div>
       <div class="modal-actions">
