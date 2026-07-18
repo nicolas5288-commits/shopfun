@@ -1,362 +1,5 @@
 [
   {
-    "id": "kr-01",
-    "country": "kr",
-    "name_zh": "MEDIHEAL 茶樹鎮靜面膜（10 片盒裝）",
-    "name_local": "메디힐 티트리 케어솔루션 마스크",
-    "category": "beauty",
-    "emoji": "🧖",
-    "price_local": "₩10,000-15,000",
-    "price_twd": "約 NT$230-345",
-    "save_stars": 4,
-    "reason": "Olive Young 面膜常勝軍，換算單片比台灣便宜一半",
-    "where": [
-      "Olive Young"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 1
-  },
-  {
-    "id": "kr-02",
-    "country": "kr",
-    "name_zh": "HBAF 蜂蜜奶油杏仁果",
-    "name_local": "바프 허니버터 아몬드",
-    "category": "snacks",
-    "emoji": "🥜",
-    "price_local": "₩5,500-7,000（190g）",
-    "price_twd": "約 NT$130-160",
-    "save_stars": 4,
-    "reason": "口味幾十種台灣買不齊，當地價便宜快一半",
-    "where": [
-      "超市",
-      "便利商店",
-      "HBAF 專賣店"
-    ],
-    "maps_query": "바프 아몬드 명동",
-    "editor_rank": 2
-  },
-  {
-    "id": "kr-03",
-    "country": "kr",
-    "name_zh": "Torriden 低分子玻尿酸精華",
-    "name_local": "토리든 다이브인 세럼",
-    "category": "beauty",
-    "emoji": "💧",
-    "price_local": "₩18,000-25,000（50ml）",
-    "price_twd": "約 NT$410-580",
-    "save_stars": 3,
-    "reason": "2025 Olive Young Awards 得主，保濕神水比台灣划算",
-    "where": [
-      "Olive Young"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 3
-  },
-  {
-    "id": "kr-04",
-    "country": "kr",
-    "name_zh": "Binggrae 香蕉牛奶（胖胖瓶）",
-    "name_local": "빙그레 바나나맛우유",
-    "category": "snacks",
-    "emoji": "🍌",
-    "price_local": "₩1,500-1,800",
-    "price_twd": "約 NT$35-40",
-    "save_stars": 5,
-    "reason": "經典胖胖瓶冷藏版台灣喝不到，來韓國必喝一罐",
-    "where": [
-      "便利商店",
-      "超市"
-    ],
-    "maps_query": "CU 편의점",
-    "editor_rank": 4
-  },
-  {
-    "id": "kr-05",
-    "country": "kr",
-    "name_zh": "Biodance 膠原蛋白凝膠面膜",
-    "name_local": "바이오던스 바이오 콜라겐 리얼 딥 마스크",
-    "category": "beauty",
-    "emoji": "✨",
-    "price_local": "₩16,000-19,000（4 片）",
-    "price_twd": "約 NT$370-440",
-    "save_stars": 3,
-    "reason": "全球熱賣的過夜水光面膜，當地買比台灣省三成",
-    "where": [
-      "Olive Young"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 5
-  },
-  {
-    "id": "kr-06",
-    "country": "kr",
-    "name_zh": "Round Lab 1025 獨島化妝水",
-    "name_local": "라운드랩 1025 독도 토너",
-    "category": "beauty",
-    "emoji": "🧴",
-    "price_local": "₩13,000-18,000（200ml）",
-    "price_twd": "約 NT$300-410",
-    "save_stars": 3,
-    "reason": "敏感肌國民化妝水，常有大容量加量版更划算",
-    "where": [
-      "Olive Young"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 6
-  },
-  {
-    "id": "kr-07",
-    "country": "kr",
-    "name_zh": "好麗友烏龜餅乾（巧克力吉拿棒口味）",
-    "name_local": "꼬북칩 초코츄러스맛",
-    "category": "snacks",
-    "emoji": "🐢",
-    "price_local": "₩1,700-3,000",
-    "price_twd": "約 NT$40-70",
-    "save_stars": 4,
-    "reason": "四層酥脆神級零食，當地價不到台灣一半",
-    "where": [
-      "超市",
-      "便利商店"
-    ],
-    "maps_query": "롯데마트 서울역점",
-    "editor_rank": 7
-  },
-  {
-    "id": "kr-08",
-    "country": "kr",
-    "name_zh": "農心辛拉麵（5 入袋裝）",
-    "name_local": "신라면",
-    "category": "snacks",
-    "emoji": "🍜",
-    "price_local": "₩3,500-5,000",
-    "price_twd": "約 NT$80-115",
-    "save_stars": 3,
-    "reason": "國民泡麵當地超市價便宜三成，黑色款更值得掃",
-    "where": [
-      "超市",
-      "便利商店"
-    ],
-    "maps_query": "롯데마트 서울역점",
-    "editor_rank": 8
-  },
-  {
-    "id": "kr-09",
-    "country": "kr",
-    "name_zh": "rom&nd 果汁唇釉",
-    "name_local": "롬앤 쥬시 래스팅 틴트",
-    "category": "beauty",
-    "emoji": "💄",
-    "price_local": "₩9,000-13,000",
-    "price_twd": "約 NT$210-300",
-    "save_stars": 3,
-    "reason": "韓系唇釉代表作，色號齊全還常搭優惠組",
-    "where": [
-      "Olive Young"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 9
-  },
-  {
-    "id": "kr-10",
-    "country": "kr",
-    "name_zh": "樂天 ZERO 零糖水果軟糖",
-    "name_local": "롯데 제로 후르츠 젤리",
-    "category": "snacks",
-    "emoji": "🍬",
-    "price_local": "₩1,500-3,000",
-    "price_twd": "約 NT$35-70",
-    "save_stars": 4,
-    "reason": "零糖低卡軟糖台灣少見，怕胖也能安心嗑",
-    "where": [
-      "超市",
-      "便利商店"
-    ],
-    "maps_query": "롯데마트 서울역점",
-    "editor_rank": 10
-  },
-  {
-    "id": "kr-11",
-    "country": "kr",
-    "name_zh": "fwee 布丁唇頰膏",
-    "name_local": "퓌 립앤치크 블러리 푸딩 팟",
-    "category": "beauty",
-    "emoji": "🍮",
-    "price_local": "₩12,000-18,000",
-    "price_twd": "約 NT$280-410",
-    "save_stars": 4,
-    "reason": "唇頰兩用 30 色任挑，台灣沒櫃只能代購",
-    "where": [
-      "Olive Young"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 11
-  },
-  {
-    "id": "kr-12",
-    "country": "kr",
-    "name_zh": "Market O 布朗尼蛋糕",
-    "name_local": "마켓오 리얼 브라우니",
-    "category": "snacks",
-    "emoji": "🍫",
-    "price_local": "₩3,000-5,500",
-    "price_twd": "約 NT$70-130",
-    "save_stars": 3,
-    "reason": "濕潤布朗尼經典伴手禮，超市買最便宜",
-    "where": [
-      "超市",
-      "便利商店"
-    ],
-    "maps_query": "이마트 용산점",
-    "editor_rank": 12
-  },
-  {
-    "id": "kr-13",
-    "country": "kr",
-    "name_zh": "東遠兩班調味海苔禮盒",
-    "name_local": "동원 양반김",
-    "category": "souvenir",
-    "emoji": "🌊",
-    "price_local": "₩8,000-13,000（多入組）",
-    "price_twd": "約 NT$180-300",
-    "save_stars": 3,
-    "reason": "送禮自用都體面，芝麻油香台灣版比不上",
-    "where": [
-      "超市"
-    ],
-    "maps_query": "롯데마트 서울역점",
-    "editor_rank": 13
-  },
-  {
-    "id": "kr-14",
-    "country": "kr",
-    "name_zh": "Mise en scène 完美護髮油",
-    "name_local": "미쟝센 퍼펙트 세럼",
-    "category": "daily",
-    "emoji": "💇",
-    "price_local": "₩10,000-13,000（80ml）",
-    "price_twd": "約 NT$230-300",
-    "save_stars": 3,
-    "reason": "國民護髮油當地常買一送一，比台灣省不少",
-    "where": [
-      "Olive Young",
-      "超市"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 14
-  },
-  {
-    "id": "kr-15",
-    "country": "kr",
-    "name_zh": "2080 防蛀護齦牙膏",
-    "name_local": "2080 치약",
-    "category": "daily",
-    "emoji": "🦷",
-    "price_local": "₩3,000-5,000",
-    "price_twd": "約 NT$70-115",
-    "save_stars": 3,
-    "reason": "韓國家庭必備牙膏，超市多條裝掃起來最划算",
-    "where": [
-      "超市",
-      "便利商店"
-    ],
-    "maps_query": "롯데마트 서울역점",
-    "editor_rank": 15
-  },
-  {
-    "id": "kr-16",
-    "country": "kr",
-    "name_zh": "鍾根堂 LACTO-FIT 益生菌",
-    "name_local": "종근당건강 락토핏 생유산균",
-    "category": "health",
-    "emoji": "💊",
-    "price_local": "₩13,000-20,000（60 入）",
-    "price_twd": "約 NT$300-460",
-    "save_stars": 4,
-    "reason": "韓國銷量第一益生菌，台灣多靠代購價貴很多",
-    "where": [
-      "超市",
-      "Olive Young",
-      "藥局"
-    ],
-    "maps_query": "롯데마트 서울역점",
-    "editor_rank": 16
-  },
-  {
-    "id": "kr-17",
-    "country": "kr",
-    "name_zh": "LEMONA 維他命 C 粉",
-    "name_local": "레모나",
-    "category": "health",
-    "emoji": "🍋",
-    "price_local": "₩12,000-20,000（70 包鐵盒）",
-    "price_twd": "約 NT$280-460",
-    "save_stars": 4,
-    "reason": "隨身包維他命C酸甜好吃，鐵盒裝送禮超可愛",
-    "where": [
-      "Olive Young",
-      "藥局",
-      "便利商店"
-    ],
-    "maps_query": "올리브영",
-    "editor_rank": 17
-  },
-  {
-    "id": "kr-18",
-    "country": "kr",
-    "name_zh": "正官庄高麗蔘精 EVERYTIME 隨身條",
-    "name_local": "정관장 홍삼정 에브리타임",
-    "category": "health",
-    "emoji": "🌿",
-    "price_local": "₩33,000-45,000（10 入）",
-    "price_twd": "約 NT$760-1,040",
-    "save_stars": 3,
-    "reason": "孝親首選紅蔘隨身條，韓國買比台灣專櫃省",
-    "where": [
-      "正官庄門市",
-      "超市",
-      "免稅店"
-    ],
-    "maps_query": "정관장 명동",
-    "editor_rank": 18
-  },
-  {
-    "id": "kr-19",
-    "country": "kr",
-    "name_zh": "KAKAO FRIENDS 角色周邊",
-    "name_local": "카카오프렌즈",
-    "category": "souvenir",
-    "emoji": "🧸",
-    "price_local": "₩8,000-30,000",
-    "price_twd": "約 NT$180-690",
-    "save_stars": 2,
-    "reason": "萊恩春植本尊旗艦店限定款多，台灣沒有專門店",
-    "where": [
-      "KAKAO FRIENDS 旗艦店"
-    ],
-    "maps_query": "카카오프렌즈 강남플래그십스토어",
-    "editor_rank": 19
-  },
-  {
-    "id": "kr-20",
-    "country": "kr",
-    "name_zh": "韓國圖案襪子",
-    "name_local": "양말",
-    "category": "daily",
-    "emoji": "🧦",
-    "price_local": "₩1,000-2,000／雙",
-    "price_twd": "約 NT$25-45",
-    "save_stars": 2,
-    "reason": "地下街銅板價一雙，卡通圖案款式多到選不完",
-    "where": [
-      "地下街",
-      "東大門",
-      "傳統市場"
-    ],
-    "maps_query": "고투몰",
-    "editor_rank": 20
-  },
-  {
     "id": "kr2-01",
     "country": "kr",
     "name_zh": "朝鮮美人 米萃益生菌防曬",
@@ -367,10 +10,7 @@
     "price_twd": "約 NT$230-370",
     "save_stars": 5,
     "reason": "韓妝部落客零負評防曬，清爽不泛白，台灣貴一倍",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 21
@@ -386,10 +26,7 @@
     "price_twd": "約 NT$370-510",
     "save_stars": 4,
     "reason": "修復爛臉神器，96%蝸牛黏液，保養新手也不踩雷",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 22
@@ -405,10 +42,7 @@
     "price_twd": "約 NT$410-550",
     "save_stars": 4,
     "reason": "TikTok爆紅油痘肌救星，鎮定又控油超好用",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 23
@@ -424,10 +58,7 @@
     "price_twd": "約 NT$500-640",
     "save_stars": 4,
     "reason": "編號系列提亮明星，上臉透亮像開燈",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 24
@@ -443,10 +74,7 @@
     "price_twd": "約 NT$280-390",
     "save_stars": 5,
     "reason": "米萃提亮精華，暗沉肌用了會發光，CP值高",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 25
@@ -462,10 +90,7 @@
     "price_twd": "約 NT$410-550",
     "save_stars": 4,
     "reason": "平價版3CE，粉質細膩顯色，色調柔和百搭",
-    "where": [
-      "Olive Young",
-      "美妝店"
-    ],
+    "where": ["Olive Young", "美妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 26
@@ -481,10 +106,7 @@
     "price_twd": "約 NT$410-580",
     "save_stars": 4,
     "reason": "積雪草鎮定泛紅，敏感肌一整年回購款",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 27
@@ -500,10 +122,7 @@
     "price_twd": "約 NT$410-530",
     "save_stars": 3,
     "reason": "自然好氣色腮紅，色號多又不顯色塊",
-    "where": [
-      "Olive Young",
-      "美妝店"
-    ],
+    "where": ["Olive Young", "美妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 28
@@ -519,10 +138,7 @@
     "price_twd": "約 NT$300-410",
     "save_stars": 4,
     "reason": "毛躁髮救星，敷一次髮尾立刻滑順",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 29
@@ -538,11 +154,7 @@
     "price_twd": "約 NT$280-410",
     "save_stars": 3,
     "reason": "漢方養髮控油，掉髮困擾必試的國民洗髮精",
-    "where": [
-      "Olive Young",
-      "樂天超市",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "樂天超市", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 30
@@ -558,10 +170,7 @@
     "price_twd": "約 NT$580-760",
     "save_stars": 3,
     "reason": "頭皮養髮精華，掉髮族群狂推，台灣少見",
-    "where": [
-      "Olive Young",
-      "藥妝店"
-    ],
+    "where": ["Olive Young", "藥妝店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 31
@@ -577,9 +186,7 @@
     "price_twd": "約 NT$25-115",
     "save_stars": 5,
     "reason": "生活雜貨挖寶天堂，銅板價買到手軟",
-    "where": [
-      "大創 Daiso"
-    ],
+    "where": ["大創 Daiso"],
     "maps_query": "다이소",
     "region_note": null,
     "editor_rank": 32
@@ -595,10 +202,7 @@
     "price_twd": "約 NT$115-280",
     "save_stars": 3,
     "reason": "韓式萬用廚房剪，剪肉剪菜超好用又耐用",
-    "where": [
-      "大創 Daiso",
-      "樂天超市"
-    ],
+    "where": ["大創 Daiso", "樂天超市"],
     "maps_query": "다이소",
     "region_note": null,
     "editor_rank": 33
@@ -614,11 +218,7 @@
     "price_twd": "約 NT$180-350",
     "save_stars": 5,
     "reason": "喝酒前後一條，隔天不頭痛，台灣很難買",
-    "where": [
-      "便利商店",
-      "藥局",
-      "Olive Young"
-    ],
+    "where": ["便利商店", "藥局", "Olive Young"],
     "maps_query": "편의점",
     "region_note": null,
     "editor_rank": 34
@@ -634,9 +234,7 @@
     "price_twd": "約 NT$230-460",
     "save_stars": 4,
     "reason": "應酬族護肝人氣藥品，藥局就買得到",
-    "where": [
-      "藥局"
-    ],
+    "where": ["藥局"],
     "maps_query": "약국",
     "region_note": null,
     "editor_rank": 35
@@ -652,10 +250,7 @@
     "price_twd": "約 NT$115-210",
     "save_stars": 4,
     "reason": "國民消化液，吃太飽脹氣喝一瓶超有感",
-    "where": [
-      "藥局",
-      "便利商店"
-    ],
+    "where": ["藥局", "便利商店"],
     "maps_query": "약국",
     "region_note": null,
     "editor_rank": 36
@@ -671,9 +266,7 @@
     "price_twd": "約 NT$115-210",
     "save_stars": 4,
     "reason": "積雪草修護傷口藥膏，韓國家庭常備藥",
-    "where": [
-      "藥局"
-    ],
+    "where": ["藥局"],
     "maps_query": "약국",
     "region_note": null,
     "editor_rank": 37
@@ -689,9 +282,7 @@
     "price_twd": "約 NT$140-230",
     "save_stars": 3,
     "reason": "韓國國民感冒糖漿，喉嚨不舒服來一瓶",
-    "where": [
-      "藥局"
-    ],
+    "where": ["藥局"],
     "maps_query": "약국",
     "region_note": null,
     "editor_rank": 38
@@ -707,10 +298,7 @@
     "price_twd": "約 NT$180-350",
     "save_stars": 3,
     "reason": "沖泡蜂蜜柚子茶，暖身又潤喉，送禮自用皆宜",
-    "where": [
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["樂天超市", "便利商店"],
     "maps_query": "롯데마트",
     "region_note": null,
     "editor_rank": 39
@@ -726,9 +314,7 @@
     "price_twd": "約 NT$580-800",
     "save_stars": 5,
     "reason": "韓國限定城市杯，收藏控必收，台灣買不到",
-    "where": [
-      "星巴克"
-    ],
+    "where": ["星巴克"],
     "maps_query": "스타벅스",
     "region_note": "韓國星巴克限定，台灣無販售",
     "editor_rank": 40
@@ -744,10 +330,7 @@
     "price_twd": "約 NT$35-60",
     "save_stars": 5,
     "reason": "國民燒酒，便利商店銅板價，帶回台灣超划算",
-    "where": [
-      "便利商店",
-      "樂天超市"
-    ],
+    "where": ["便利商店", "樂天超市"],
     "maps_query": "편의점",
     "region_note": "酒類，未成年勿飲；出境限量申報",
     "editor_rank": 41
@@ -763,11 +346,7 @@
     "price_twd": "約 NT$115-280",
     "save_stars": 3,
     "reason": "GD同款傳統蜜糖果子，酥脆香甜爆紅伴手禮",
-    "where": [
-      "Olive Young",
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["Olive Young", "樂天超市", "便利商店"],
     "maps_query": "올리브영",
     "region_note": null,
     "editor_rank": 42
@@ -783,9 +362,7 @@
     "price_twd": "約 NT$70-350",
     "save_stars": 3,
     "reason": "設計文具小物，年輕有趣，挑禮物好逛",
-    "where": [
-      "Artbox"
-    ],
+    "where": ["Artbox"],
     "maps_query": "아트박스",
     "region_note": null,
     "editor_rank": 43
@@ -801,10 +378,7 @@
     "price_twd": "約 NT$90-140",
     "save_stars": 4,
     "reason": "地表最辣炒麵，辣控挑戰必買，口味超多",
-    "where": [
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["樂天超市", "便利商店"],
     "maps_query": "롯데마트",
     "region_note": null,
     "editor_rank": 44
@@ -820,10 +394,7 @@
     "price_twd": "約 NT$35-70",
     "save_stars": 4,
     "reason": "鹹甜奶油香爆棚，一開就停不下來",
-    "where": [
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["樂天超市", "便利商店"],
     "maps_query": "롯데마트",
     "region_note": null,
     "editor_rank": 45
@@ -839,10 +410,7 @@
     "price_twd": "約 NT$35-60",
     "save_stars": 3,
     "reason": "韓版蝦味先，酥脆涮嘴，配啤酒一流",
-    "where": [
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["樂天超市", "便利商店"],
     "maps_query": "롯데마트",
     "region_note": null,
     "editor_rank": 46
@@ -858,10 +426,7 @@
     "price_twd": "約 NT$35-60",
     "save_stars": 3,
     "reason": "國民餅乾棒，口味多又好分享，伴手禮首選",
-    "where": [
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["樂天超市", "便利商店"],
     "maps_query": "롯데마트",
     "region_note": null,
     "editor_rank": 47
@@ -877,9 +442,7 @@
     "price_twd": "約 NT$70-115",
     "save_stars": 4,
     "reason": "Olive Young零食銷售冠軍，酥脆貝果香一包接一包",
-    "where": [
-      "Olive Young"
-    ],
+    "where": ["Olive Young"],
     "maps_query": "올리브영",
     "region_note": "Olive Young 熱銷第一，僅該通路有售",
     "editor_rank": 48
@@ -895,10 +458,7 @@
     "price_twd": "約 NT$70-115",
     "save_stars": 3,
     "reason": "濃郁巧克力餅乾，入口即化，長輩小孩都愛",
-    "where": [
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["樂天超市", "便利商店"],
     "maps_query": "롯데마트",
     "region_note": null,
     "editor_rank": 49
@@ -914,10 +474,7 @@
     "price_twd": "約 NT$180-350",
     "save_stars": 4,
     "reason": "孔劉代言即溶美式，隨手一包香醇不苦",
-    "where": [
-      "樂天超市",
-      "便利商店"
-    ],
+    "where": ["樂天超市", "便利商店"],
     "maps_query": "롯데마트",
     "region_note": null,
     "editor_rank": 50

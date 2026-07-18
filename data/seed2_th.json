@@ -1,371 +1,5 @@
 [
   {
-    "id": "th-01",
-    "country": "th",
-    "name_zh": "小老闆海苔",
-    "name_local": "Tao Kae Noi",
-    "category": "snacks",
-    "emoji": "🌿",
-    "price_local": "฿20-40",
-    "price_twd": "約 NT$19-37",
-    "save_stars": 4,
-    "reason": "泰國國民海苔，口味比台灣多又便宜快一半",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
-    "maps_query": "Big C Supercenter Ratchadamri",
-    "editor_rank": 1
-  },
-  {
-    "id": "th-02",
-    "country": "th",
-    "name_zh": "皇家牛乳片",
-    "name_local": "Royal Milk Tablet",
-    "category": "snacks",
-    "emoji": "🥛",
-    "price_local": "฿18-25",
-    "price_twd": "約 NT$17-23",
-    "save_stars": 5,
-    "reason": "皇室牧場出品，一包不到30元台灣買不到",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
-    "maps_query": "Big C Supercenter Ratchadamri",
-    "editor_rank": 2
-  },
-  {
-    "id": "th-03",
-    "country": "th",
-    "name_zh": "手標泰式奶茶",
-    "name_local": "ChaTraMue",
-    "category": "souvenir",
-    "emoji": "🧋",
-    "price_local": "฿85-145",
-    "price_twd": "約 NT$79-135",
-    "save_stars": 5,
-    "reason": "國民泰奶茶粉罐裝，台灣代購價貴一倍以上",
-    "where": [
-      "Big C",
-      "超市",
-      "機場"
-    ],
-    "maps_query": "ChaTraMue",
-    "editor_rank": 3
-  },
-  {
-    "id": "th-04",
-    "country": "th",
-    "name_zh": "Dentiste 夜用牙膏",
-    "name_local": "Dentiste' Toothpaste",
-    "category": "beauty",
-    "emoji": "🦷",
-    "price_local": "฿135-300",
-    "price_twd": "約 NT$126-279",
-    "save_stars": 4,
-    "reason": "Lisa代言的國民牙膏，泰國買比台灣省超過三成",
-    "where": [
-      "屈臣氏",
-      "Boots藥妝",
-      "Big C"
-    ],
-    "maps_query": "Watsons Siam Square",
-    "editor_rank": 4
-  },
-  {
-    "id": "th-05",
-    "country": "th",
-    "name_zh": "蛇牌爽身粉",
-    "name_local": "Snake Brand Prickly Heat Powder",
-    "category": "daily",
-    "emoji": "🐍",
-    "price_local": "฿33-90",
-    "price_twd": "約 NT$31-84",
-    "save_stars": 4,
-    "reason": "含薄荷超涼感，止癢防痱夏天神物又便宜",
-    "where": [
-      "Big C",
-      "7-11",
-      "Boots藥妝"
-    ],
-    "maps_query": "Big C Supercenter Ratchadamri",
-    "editor_rank": 5
-  },
-  {
-    "id": "th-06",
-    "country": "th",
-    "name_zh": "大哥花生豆",
-    "name_local": "Koh-Kae",
-    "category": "snacks",
-    "emoji": "🥜",
-    "price_local": "฿31-62",
-    "price_twd": "約 NT$29-58",
-    "save_stars": 4,
-    "reason": "椰奶、酸辣湯等口味台灣少見，價格省快一半",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
-    "maps_query": "Big C Supercenter Ratchadamri",
-    "editor_rank": 6
-  },
-  {
-    "id": "th-07",
-    "country": "th",
-    "name_zh": "樂事泰國限定洋芋片",
-    "name_local": "Lay's Thailand",
-    "category": "snacks",
-    "emoji": "🍟",
-    "price_local": "฿31-40",
-    "price_twd": "約 NT$29-37",
-    "save_stars": 3,
-    "reason": "打拋豬、冬蔭功等口味只有泰國有",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
-    "maps_query": "7-Eleven",
-    "editor_rank": 7
-  },
-  {
-    "id": "th-08",
-    "country": "th",
-    "name_zh": "虎標萬金油／貼布",
-    "name_local": "Tiger Balm",
-    "category": "health",
-    "emoji": "🐯",
-    "price_local": "฿56-200",
-    "price_twd": "約 NT$52-186",
-    "save_stars": 4,
-    "reason": "經典萬金油泰國價比台灣便宜，順手多帶幾罐",
-    "where": [
-      "Boots藥妝",
-      "Big C",
-      "當地藥局"
-    ],
-    "maps_query": "Boots Pharmacy Bangkok",
-    "editor_rank": 8
-  },
-  {
-    "id": "th-09",
-    "country": "th",
-    "name_zh": "Counterpain 痠痛軟膏",
-    "name_local": "Counterpain",
-    "category": "health",
-    "emoji": "💪",
-    "price_local": "฿139-169",
-    "price_twd": "約 NT$129-157",
-    "save_stars": 4,
-    "reason": "肌肉痠痛神膏，藥局買比台灣代購省超多",
-    "where": [
-      "屈臣氏",
-      "Boots藥妝",
-      "當地藥局"
-    ],
-    "maps_query": "Watsons Siam Square",
-    "editor_rank": 9
-  },
-  {
-    "id": "th-10",
-    "country": "th",
-    "name_zh": "五塔散（行軍散）",
-    "name_local": "Ya-Hom Powder Five Pagodas",
-    "category": "health",
-    "emoji": "🏯",
-    "price_local": "฿22-44",
-    "price_twd": "約 NT$20-41",
-    "save_stars": 5,
-    "reason": "腸胃不適救星，一罐銅板價台灣買不到",
-    "where": [
-      "Boots藥妝",
-      "當地藥局"
-    ],
-    "maps_query": "Boots Pharmacy Bangkok",
-    "editor_rank": 10
-  },
-  {
-    "id": "th-11",
-    "country": "th",
-    "name_zh": "蜈蚣牌止咳丸",
-    "name_local": "Takabb Anti-Cough Pill",
-    "category": "health",
-    "emoji": "💊",
-    "price_local": "฿20-40",
-    "price_twd": "約 NT$19-37",
-    "save_stars": 5,
-    "reason": "喉嚨卡卡含一顆，超商就買得到的百年老牌",
-    "where": [
-      "7-11",
-      "當地藥局"
-    ],
-    "maps_query": "7-Eleven",
-    "editor_rank": 11
-  },
-  {
-    "id": "th-12",
-    "country": "th",
-    "name_zh": "泰國芒果乾",
-    "name_local": "Dried Mango",
-    "category": "snacks",
-    "emoji": "🥭",
-    "price_local": "฿100-200",
-    "price_twd": "約 NT$93-186",
-    "save_stars": 3,
-    "reason": "泰好吃、皇家兩大品牌，果肉厚比台灣划算",
-    "where": [
-      "Big C",
-      "超市"
-    ],
-    "maps_query": "Big C Supercenter Ratchadamri",
-    "editor_rank": 12
-  },
-  {
-    "id": "th-13",
-    "country": "th",
-    "name_zh": "Bento 超味魷魚片",
-    "name_local": "Bento Squid Snack",
-    "category": "snacks",
-    "emoji": "🦑",
-    "price_local": "฿19-30",
-    "price_twd": "約 NT$18-28",
-    "save_stars": 4,
-    "reason": "香辣涮嘴的下酒神物，扁包裝好塞行李箱",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
-    "maps_query": "7-Eleven",
-    "editor_rank": 13
-  },
-  {
-    "id": "th-14",
-    "country": "th",
-    "name_zh": "上標油",
-    "name_local": "Siang Pure Oil",
-    "category": "health",
-    "emoji": "🧴",
-    "price_local": "฿25-80",
-    "price_twd": "約 NT$23-74",
-    "save_stars": 4,
-    "reason": "草本清涼油，提神止暈滾珠款隨身好用",
-    "where": [
-      "7-11",
-      "Boots藥妝",
-      "Big C"
-    ],
-    "maps_query": "Boots Pharmacy Bangkok",
-    "editor_rank": 14
-  },
-  {
-    "id": "th-15",
-    "country": "th",
-    "name_zh": "薄荷鼻通棒",
-    "name_local": "Peppermint Field Inhaler",
-    "category": "health",
-    "emoji": "🌬️",
-    "price_local": "฿25-45",
-    "price_twd": "約 NT$23-42",
-    "save_stars": 5,
-    "reason": "鼻塞提神一吸就醒，銅板價台灣沒得買",
-    "where": [
-      "7-11",
-      "Big C"
-    ],
-    "maps_query": "7-Eleven",
-    "editor_rank": 15
-  },
-  {
-    "id": "th-16",
-    "country": "th",
-    "name_zh": "Soffell 防蚊液",
-    "name_local": "Soffell Mosquito Repellent",
-    "category": "daily",
-    "emoji": "🦟",
-    "price_local": "฿39-81",
-    "price_twd": "約 NT$36-75",
-    "save_stars": 3,
-    "reason": "防蚊長達7小時，東南亞旅遊邊玩邊補",
-    "where": [
-      "7-11",
-      "Big C"
-    ],
-    "maps_query": "7-Eleven",
-    "editor_rank": 16
-  },
-  {
-    "id": "th-17",
-    "country": "th",
-    "name_zh": "Srichand 控油蜜粉",
-    "name_local": "Srichand Translucent Powder",
-    "category": "beauty",
-    "emoji": "✨",
-    "price_local": "฿140-380",
-    "price_twd": "約 NT$130-353",
-    "save_stars": 4,
-    "reason": "泰國老牌控油蜜粉，熱天不脫妝台灣難入手",
-    "where": [
-      "屈臣氏",
-      "Boots藥妝"
-    ],
-    "maps_query": "Boots Pharmacy Bangkok",
-    "editor_rank": 17
-  },
-  {
-    "id": "th-18",
-    "country": "th",
-    "name_zh": "Cute Press 四色眼影",
-    "name_local": "Cute Press Eyeshadow Palette",
-    "category": "beauty",
-    "emoji": "🎨",
-    "price_local": "฿99-199",
-    "price_twd": "約 NT$92-185",
-    "save_stars": 4,
-    "reason": "百元有找的泰系彩妝，顯色好用台灣沒專櫃",
-    "where": [
-      "屈臣氏",
-      "Big C"
-    ],
-    "maps_query": "Watsons Siam Square",
-    "editor_rank": 18
-  },
-  {
-    "id": "th-19",
-    "country": "th",
-    "name_zh": "NaRaYa 曼谷包",
-    "name_local": "NaRaYa",
-    "category": "souvenir",
-    "emoji": "👜",
-    "price_local": "฿150-500",
-    "price_twd": "約 NT$140-465",
-    "save_stars": 4,
-    "reason": "輕巧耐用的國民曼谷包，本店買最便宜款式全",
-    "where": [
-      "NaRaYa門市",
-      "百貨"
-    ],
-    "maps_query": "NaRaYa CentralWorld",
-    "editor_rank": 19
-  },
-  {
-    "id": "th-20",
-    "country": "th",
-    "name_zh": "多芬護髮膠囊",
-    "name_local": "Dove Hair Serum Capsules",
-    "category": "daily",
-    "emoji": "💇",
-    "price_local": "฿89",
-    "price_twd": "約 NT$83",
-    "save_stars": 3,
-    "reason": "泰國限定護髮小物，便宜好帶送人自用都行",
-    "where": [
-      "Big C",
-      "屈臣氏"
-    ],
-    "maps_query": "Big C Supercenter Ratchadamri",
-    "editor_rank": 20
-  },
-  {
     "id": "th2-01",
     "country": "th",
     "name_zh": "MAMA 泡麵",
@@ -376,10 +10,7 @@
     "price_twd": "約 NT$6-14",
     "save_stars": 4,
     "reason": "泰國國民泡麵，口味多市佔第一，一包幾塊錢",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
+    "where": ["Big C", "7-11"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 21
@@ -395,10 +26,7 @@
     "price_twd": "約 NT$112-233",
     "save_stars": 3,
     "reason": "米其林餐廳咖哩包，在家15分鐘上桌",
-    "where": [
-      "Big C",
-      "機場"
-    ],
+    "where": ["Big C", "機場"],
     "maps_query": "Blue Elephant Bangkok",
     "region_note": "Big C、機場較好找",
     "editor_rank": 22
@@ -414,10 +42,7 @@
     "price_twd": "約 NT$12-14",
     "save_stars": 4,
     "reason": "冬蔭功、打拋豬鹹香餅乾棒，台灣沒有",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
+    "where": ["Big C", "7-11"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 23
@@ -433,10 +58,7 @@
     "price_twd": "約 NT$23-55",
     "save_stars": 5,
     "reason": "泰航頭等艙梅子，酸甜提神超涮嘴",
-    "where": [
-      "7-11",
-      "Big C"
-    ],
+    "where": ["7-11", "Big C"],
     "maps_query": "7-Eleven Bangkok",
     "region_note": null,
     "editor_rank": 24
@@ -452,10 +74,7 @@
     "price_twd": "約 NT$19-33",
     "save_stars": 4,
     "reason": "泰版辣味魚香絲，配啤酒宵夜神物",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
+    "where": ["Big C", "7-11"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 25
@@ -471,10 +90,7 @@
     "price_twd": "約 NT$37-84",
     "save_stars": 3,
     "reason": "香酥椰子脆捲，獨立包裝好送人",
-    "where": [
-      "Big C",
-      "機場"
-    ],
+    "where": ["Big C", "機場"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 26
@@ -490,10 +106,7 @@
     "price_twd": "約 NT$14-17",
     "save_stars": 4,
     "reason": "香蕉芒果限定口味，像香蕉牛奶",
-    "where": [
-      "Big C",
-      "超市"
-    ],
+    "where": ["Big C", "超市"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 27
@@ -509,10 +122,7 @@
     "price_twd": "約 NT$19-37",
     "save_stars": 3,
     "reason": "芒果內餡小熊餅，小孩最愛",
-    "where": [
-      "Big C",
-      "7-11"
-    ],
+    "where": ["Big C", "7-11"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 28
@@ -528,10 +138,7 @@
     "price_twd": "約 NT$233-698",
     "save_stars": 4,
     "reason": "泰國國民蝸牛霜，比台灣代購便宜一截",
-    "where": [
-      "藥妝店",
-      "Boots"
-    ],
+    "where": ["藥妝店", "Boots"],
     "maps_query": "Boots Thailand",
     "region_note": null,
     "editor_rank": 29
@@ -547,11 +154,7 @@
     "price_twd": "約 NT$92-233",
     "save_stars": 4,
     "reason": "泰國開架彩妝之王，睫毛膏平價好用",
-    "where": [
-      "7-11",
-      "屈臣氏",
-      "Boots"
-    ],
+    "where": ["7-11", "屈臣氏", "Boots"],
     "maps_query": "Watsons Thailand",
     "region_note": null,
     "editor_rank": 30
@@ -567,10 +170,7 @@
     "price_twd": "約 NT$83-241",
     "save_stars": 3,
     "reason": "平價Q10牛奶保養，一整組不心疼",
-    "where": [
-      "Beauty Buffet專櫃",
-      "百貨"
-    ],
+    "where": ["Beauty Buffet專櫃", "百貨"],
     "maps_query": "Beauty Buffet",
     "region_note": "多在 Beauty Buffet 專櫃或百貨",
     "editor_rank": 31
@@ -586,10 +186,7 @@
     "price_twd": "約 NT$27-36",
     "save_stars": 4,
     "reason": "精華滿滿面膜，7-11就有單片特價",
-    "where": [
-      "7-11",
-      "屈臣氏"
-    ],
+    "where": ["7-11", "屈臣氏"],
     "maps_query": "7-Eleven Bangkok",
     "region_note": null,
     "editor_rank": 32
@@ -605,10 +202,7 @@
     "price_twd": "約 NT$139-241",
     "save_stars": 4,
     "reason": "泰國限定10倍C美白身體乳，人手一瓶",
-    "where": [
-      "Big C",
-      "屈臣氏"
-    ],
+    "where": ["Big C", "屈臣氏"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": "泰國限定美白款",
     "editor_rank": 33
@@ -624,11 +218,7 @@
     "price_twd": "約 NT$73-241",
     "save_stars": 4,
     "reason": "可愛包裝素顏霜氣墊，少女最愛",
-    "where": [
-      "屈臣氏",
-      "Boots",
-      "7-11"
-    ],
+    "where": ["屈臣氏", "Boots", "7-11"],
     "maps_query": "Boots Thailand",
     "region_note": null,
     "editor_rank": 34
@@ -644,10 +234,7 @@
     "price_twd": "約 NT$11-14",
     "save_stars": 4,
     "reason": "一包護髮媲美沙龍，十幾塊搞定",
-    "where": [
-      "7-11",
-      "屈臣氏"
-    ],
+    "where": ["7-11", "屈臣氏"],
     "maps_query": "7-Eleven Bangkok",
     "region_note": null,
     "editor_rank": 35
@@ -663,11 +250,7 @@
     "price_twd": "約 NT$37-84",
     "save_stars": 4,
     "reason": "草本黑牙膏溫和不辣口，老牌口碑",
-    "where": [
-      "Big C",
-      "超市",
-      "屈臣氏"
-    ],
+    "where": ["Big C", "超市", "屈臣氏"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 36
@@ -683,11 +266,7 @@
     "price_twd": "約 NT$23-42",
     "save_stars": 4,
     "reason": "阿嬤牌天然草本皂，一顆二三十塊",
-    "where": [
-      "Big C",
-      "超市",
-      "Madame Heng門市"
-    ],
+    "where": ["Big C", "超市", "Madame Heng門市"],
     "maps_query": "Madame Heng",
     "region_note": null,
     "editor_rank": 37
@@ -703,10 +282,7 @@
     "price_twd": "約 NT$93-186",
     "save_stars": 3,
     "reason": "香味超持久的洗衣柔軟珠，衣服香整天",
-    "where": [
-      "Big C",
-      "超市"
-    ],
+    "where": ["Big C", "超市"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 38
@@ -722,9 +298,7 @@
     "price_twd": "約 NT$19-93",
     "save_stars": 3,
     "reason": "泰版大創，文具生活小物20泰銖起",
-    "where": [
-      "Big C"
-    ],
+    "where": ["Big C"],
     "maps_query": "Moshi Moshi Big C",
     "region_note": "Big C 內設 Moshi Moshi 專櫃",
     "editor_rank": 39
@@ -740,10 +314,7 @@
     "price_twd": "約 NT$177-735",
     "save_stars": 2,
     "reason": "黑米香皂加香氛，質感送禮首選",
-    "where": [
-      "百貨專櫃",
-      "機場"
-    ],
+    "where": ["百貨專櫃", "機場"],
     "maps_query": "HARNN ICONSIAM",
     "region_note": "百貨專櫃、機場為主",
     "editor_rank": 40
@@ -759,10 +330,7 @@
     "price_twd": "約 NT$363-1,302",
     "save_stars": 2,
     "reason": "香木系列擴香，五星飯店的味道",
-    "where": [
-      "百貨專櫃",
-      "機場"
-    ],
+    "where": ["百貨專櫃", "機場"],
     "maps_query": "THANN",
     "region_note": "百貨專櫃、機場為主",
     "editor_rank": 41
@@ -778,10 +346,7 @@
     "price_twd": "約 NT$363-921",
     "save_stars": 3,
     "reason": "大Logo帆布包，泰國潮流代表",
-    "where": [
-      "Siam Square",
-      "百貨"
-    ],
+    "where": ["Siam Square", "百貨"],
     "maps_query": "Gentlewoman Siam Square",
     "region_note": "旗艦店在 Siam Square，款式最全",
     "editor_rank": 42
@@ -797,9 +362,7 @@
     "price_twd": "約 NT$512-698",
     "save_stars": 2,
     "reason": "曼谷限定手繪城市杯，收藏紀念感十足",
-    "where": [
-      "星巴克門市"
-    ],
+    "where": ["星巴克門市"],
     "maps_query": "Starbucks Bangkok",
     "region_note": "曼谷城市限定款",
     "editor_rank": 43
@@ -815,10 +378,7 @@
     "price_twd": "約 NT$56-140",
     "save_stars": 4,
     "reason": "天然蝶豆花茶，加檸檬變紫超好拍",
-    "where": [
-      "Big C",
-      "超市"
-    ],
+    "where": ["Big C", "超市"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 44
@@ -834,10 +394,7 @@
     "price_twd": "約 NT$47-120",
     "save_stars": 3,
     "reason": "泰式高山三合一咖啡，濃香隨手沖",
-    "where": [
-      "Big C",
-      "超市"
-    ],
+    "where": ["Big C", "超市"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 45
@@ -853,11 +410,7 @@
     "price_twd": "約 NT$47-112",
     "save_stars": 4,
     "reason": "玉菩堂青草膏，蚊咬痠痛暈車都能擦",
-    "where": [
-      "Big C",
-      "7-11",
-      "屈臣氏"
-    ],
+    "where": ["Big C", "7-11", "屈臣氏"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 46
@@ -873,10 +426,7 @@
     "price_twd": "約 NT$37-84",
     "save_stars": 4,
     "reason": "拜耳青草膏，燙傷蚊咬萬用小護士",
-    "where": [
-      "Big C",
-      "藥妝店"
-    ],
+    "where": ["Big C", "藥妝店"],
     "maps_query": "Big C Supercenter Ratchadamri",
     "region_note": null,
     "editor_rank": 47
@@ -892,10 +442,7 @@
     "price_twd": "約 NT$121-140",
     "save_stars": 3,
     "reason": "蜂膠噴喉嚨，講話多喉嚨癢必備",
-    "where": [
-      "藥局",
-      "Boots"
-    ],
+    "where": ["藥局", "Boots"],
     "maps_query": "Boots Thailand",
     "region_note": "多在藥局或 Boots 藥妝",
     "editor_rank": 48
@@ -911,10 +458,7 @@
     "price_twd": "約 NT$56-140",
     "save_stars": 3,
     "reason": "草本熱敷球，按摩舒壓帶回家",
-    "where": [
-      "市集",
-      "SPA店"
-    ],
+    "where": ["市集", "SPA店"],
     "maps_query": "Chatuchak Weekend Market",
     "region_note": "市集、SPA 店較好找",
     "editor_rank": 49
@@ -930,10 +474,7 @@
     "price_twd": "約 NT$37-92",
     "save_stars": 3,
     "reason": "蜂膠潤喉糖，喉嚨乾癢隨身含",
-    "where": [
-      "7-11",
-      "藥局"
-    ],
+    "where": ["7-11", "藥局"],
     "maps_query": "7-Eleven Bangkok",
     "region_note": null,
     "editor_rank": 50
