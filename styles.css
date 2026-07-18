@@ -530,6 +530,12 @@ body {
 .sub-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
 .char-count { position: absolute; right: 0; font-size: 12px; font-weight: 500; color: var(--ink-faint); }
 .sub-form label:has(.char-count) { position: relative; }
+.wish-field { display: block; position: relative; margin-top: 14px; }
+.wish-field .char-count { top: -2px; }
+.wish-field textarea { width: 100%; font-family: var(--sans); font-size: 15px; color: var(--ink); border: 1px solid var(--line); background: var(--card); border-radius: 12px; padding: 12px 14px; resize: vertical; margin-top: 16px; }
+.wish-field textarea:focus { outline: none; border-color: var(--accent); }
+.wish-icon { font-size: 22px; flex: none; }
+.wish-content { font-size: 14.5px; line-height: 1.6; color: var(--ink); }
 .sub-form input, .sub-form select, .sub-form textarea {
   font-family: var(--sans); font-size: 15px; color: var(--ink); font-weight: 400;
   border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 11px 14px; width: 100%;

@@ -206,6 +206,7 @@ function renderRight() {
         <a href="#/notifications" class="tb-mi">🔔 通知中心${state.unread > 0 ? ` <span class="tb-badge">${state.unread}</span>` : ""}</a>
         <a href="#/hot" class="tb-mi">🔥 近期熱門</a>
         <div class="tb-mdiv"></div>
+        <button class="tb-mi" id="miWish">🌠 許願池</button>
         <button class="tb-mi" id="miGuide">❓ 使用說明</button>
         <button class="tb-mi" id="miInstall">📲 加到主畫面</button>
         ${cfg.COMMUNITY_URL ? `<a href="${esc(cfg.COMMUNITY_URL)}" target="_blank" rel="noopener" class="tb-mi">👥 使用者社群</a>` : ""}
@@ -217,6 +218,7 @@ function renderRight() {
     const menu = document.getElementById("tbMenu");
     document.getElementById("tbUser").onclick = (e) => { e.stopPropagation(); menu.hidden = !menu.hidden; };
     document.getElementById("btnLogout").onclick = logout;
+    document.getElementById("miWish").onclick = () => { menu.hidden = true; showWishModal(); };
     document.getElementById("miGuide").onclick = () => { menu.hidden = true; showGuideModal(); };
     document.getElementById("miInstall").onclick = () => { menu.hidden = true; showInstallModal(); };
     menu.querySelectorAll("a").forEach((a) => a.onclick = () => { menu.hidden = true; });
@@ -592,6 +594,55 @@ function showGuideModal() {
   overlay.onclick = (e) => { if (e.target === overlay) close(); };
 }
 
+/* ---------- 🌠 許願池 ---------- */
+function showWishModal() {
+  if (!state.user) return requireLogin();
+  document.querySelector(".modal-overlay")?.remove();
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-emoji">🌠</div>
+      <h2 class="modal-title">許願池</h2>
+      <p class="modal-sub">想對站長說的話、或想要的功能，都丟進來吧！</p>
+      <div class="adm-tabs" style="justify-content:center">
+        <button class="cat-tab active" data-wtype="wish">✨ 功能許願</button>
+        <button class="cat-tab" data-wtype="message">💬 對站長說</button>
+      </div>
+      <label class="wish-field">
+        <span class="char-count" id="wishCount">0/200</span>
+        <textarea id="wishText" maxlength="200" rows="4" placeholder="寫下你的願望或想說的話…"></textarea>
+      </label>
+      <div class="modal-actions"><button class="modal-btn primary" id="wishSend">送出許願</button></div>
+      <button class="modal-close" id="wishClose">關閉</button>
+      <div class="sub-msg" id="wishMsg"></div>
+    </div>`;
+  document.body.appendChild(overlay);
+  let type = "wish";
+  const close = () => overlay.remove();
+  overlay.onclick = close;
+  document.getElementById("wishClose").onclick = close;
+  const ta = document.getElementById("wishText");
+  const cc = document.getElementById("wishCount");
+  ta.addEventListener("input", () => { cc.textContent = `${ta.value.length}/200`; });
+  overlay.querySelectorAll("[data-wtype]").forEach((b) => b.onclick = () => {
+    type = b.dataset.wtype;
+    overlay.querySelectorAll("[data-wtype]").forEach((x) => x.classList.toggle("active", x === b));
+    ta.placeholder = type === "wish" ? "想要什麼功能？例：加韓國機場地圖…" : "想對站長說的話…";
+  });
+  document.getElementById("wishSend").onclick = async () => {
+    const content = ta.value.trim();
+    if (!content) { document.getElementById("wishMsg").textContent = "寫點東西再送出吧～"; return; }
+    const btn = document.getElementById("wishSend"); btn.disabled = true; btn.textContent = "送出中…";
+    // ⚠️ 不接 .select()：user 無 select 權限，要求回傳會 42501
+    const { error } = await supa.from("wishes").insert({ user_id: state.user.id, type, content });
+    btn.disabled = false; btn.textContent = "送出許願";
+    if (error) { document.getElementById("wishMsg").textContent = error.message.includes("許了") ? error.message : "送出失敗：" + error.message; return; }
+    close();
+    toast("已丟進許願池，站長會看到的 🌠");
+  };
+}
+
 /* ---------- 我的清單 ---------- */
 function renderList() {
   renderNav(null);
@@ -902,20 +953,22 @@ async function renderNotifications() {
 }
 
 /* ---------- 管理後台 ---------- */
-const ADMIN_TABS = { stats: "📊 數據", photos: "📷 補圖審核", reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
-const adm = { products: [], likeCount: new Map(), pending: [], tab: "stats", search: "", country: "all", category: "all", loading: false };
+const ADMIN_TABS = { stats: "📊 數據", photos: "📷 補圖審核", wishes: "🌠 許願池", reported: "🚨 被檢舉", quar: "🆕 檢疫區", all: "📦 全部商品", removed: "🗑 已下架" };
+const adm = { products: [], likeCount: new Map(), pending: [], wishes: [], tab: "stats", search: "", country: "all", category: "all", loading: false };
 
 async function loadAdminData() {
-  const [{ data: prods, error: e1 }, { data: likes }, imgR] = await Promise.all([
+  const [{ data: prods, error: e1 }, { data: likes }, imgR, wishR] = await Promise.all([
     supa.from("products").select("*"),
     supa.from("likes").select("product_id"),
     supa.from("image_submissions").select("*").eq("status", "pending").order("created_at", { ascending: true }),
+    supa.from("wishes").select("*").order("created_at", { ascending: false }),
   ]);
   if (e1) throw e1;
   adm.likeCount = new Map();
   (likes || []).forEach((l) => adm.likeCount.set(l.product_id, (adm.likeCount.get(l.product_id) || 0) + 1));
   adm.products = (prods || []).map((p) => ({ ...p, like_count: adm.likeCount.get(p.id) || 0 }));
   adm.pending = imgR.error ? [] : (imgR.data || []); // image_submissions 表未建時忽略
+  adm.wishes = wishR.error ? [] : (wishR.data || []); // wishes 表未建時忽略
 }
 
 async function renderAdmin() {
@@ -937,8 +990,34 @@ async function renderAdmin() {
   $app.querySelectorAll("[data-atab]").forEach((b) => b.onclick = () => { adm.tab = b.dataset.atab; adm.search = ""; adm.country = "all"; adm.category = "all"; renderAdmin(); });
   if (adm.tab === "stats") { renderAdminStats(); }
   else if (adm.tab === "photos") { document.getElementById("admToolbar").innerHTML = ""; renderAdminPhotos(); }
+  else if (adm.tab === "wishes") { document.getElementById("admToolbar").innerHTML = ""; renderAdminWishes(); }
   else { renderAdminToolbar(); renderAdminList(); }
   window.scrollTo(0, 0);
+}
+
+function renderAdminWishes() {
+  const box = document.getElementById("admList");
+  if (!adm.wishes.length) { box.innerHTML = `<div class="empty-state"><div class="big">🌠</div><p>許願池還是空的。</p></div>`; return; }
+  box.innerHTML = adm.wishes.map((w) => {
+    const nick = state.nickById.get(w.user_id) || "網友";
+    const date = new Date(w.created_at).toLocaleDateString("zh-TW", { month: "numeric", day: "numeric" });
+    const icon = w.type === "wish" ? "✨" : "💬";
+    return `<div class="adm-row">
+      <span class="wish-icon">${icon}</span>
+      <div class="adm-main"><div class="wish-content">${esc(w.content)}</div><div class="adm-meta">由 ${esc(nick)} · ${date}</div></div>
+      <div class="adm-actions"><button class="adm-btn danger" data-wdel="${esc(w.id)}">🗑 刪除</button></div>
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-wdel]").forEach((b) => b.onclick = () => deleteWish(b.dataset.wdel));
+}
+async function deleteWish(id) {
+  if (!confirm("刪除這則許願？")) return;
+  const { data, error } = await supa.from("wishes").delete().eq("id", id).select();
+  if (error) { toast("刪除失敗：" + error.message); return; }
+  if (!data || !data.length) { toast("沒有權限"); return; }
+  adm.wishes = adm.wishes.filter((w) => w.id !== id);
+  toast("已刪除");
+  renderAdmin();
 }
 
 async function renderAdminPhotos() {
@@ -1001,6 +1080,7 @@ async function renderAdminStats() {
 function countTab(tab) {
   const P = adm.products;
   if (tab === "photos") return adm.pending.length;
+  if (tab === "wishes") return adm.wishes.length;
   if (tab === "reported") return P.filter((p) => p.report_count > 0 && p.status !== "removed").length;
   if (tab === "quar") return P.filter((p) => p.status === "new").length;
   if (tab === "all") return P.filter((p) => p.status === "ranked").length;
