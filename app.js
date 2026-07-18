@@ -153,8 +153,52 @@ async function loadUserState() {
   if (profR.status === "fulfilled" && profR.value.data) state.profile = profR.value.data;
   if (unreadR.status === "fulfilled" && typeof unreadR.value.count === "number") state.unread = unreadR.value.count;
 }
+/* 站內瀏覽器偵測（Threads/IG/FB/LINE/Messenger/TikTok 內嵌視窗會被 Google 擋 OAuth 登入） */
+function inAppBrowser() {
+  const ua = navigator.userAgent;
+  if (/Barcelona|BarcelonaAndroid/i.test(ua)) return "Threads";
+  if (/Instagram/i.test(ua)) return "Instagram";
+  if (/FBAN|FBAV|FB_IAB|Messenger/i.test(ua)) return "Facebook";
+  if (/\bLine\//i.test(ua)) return "LINE";
+  if (/musical_ly|Bytedance|TTWebView/i.test(ua)) return "TikTok";
+  return null;
+}
+function showInAppModal(fromLogin) {
+  document.querySelector(".modal-overlay")?.remove();
+  const app = inAppBrowser() || "App";
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-emoji">🌐</div>
+      <h2 class="modal-title">建議改用瀏覽器開啟</h2>
+      <p class="modal-sub">你正在 ${esc(app)} 的站內視窗瀏覽。${fromLogin ? "這裡<b>沒辦法用 Google 登入</b>（Google 官方限制），" : "在這裡逛沒問題，但<b>按讚、投稿要登入時會被 Google 擋下</b>。"}換到 Safari / Chrome 就正常了：</p>
+      <ul class="guide-list">
+        <li><span>1️⃣</span><div>點畫面角落的 <b>⋯ 或分享鈕</b></div></li>
+        <li><span>2️⃣</span><div>選「<b>以外部瀏覽器開啟</b>」或「在瀏覽器中打開」</div></li>
+        <li><span>💡</span><div>找不到的話，按下面複製網址，貼到瀏覽器開</div></li>
+      </ul>
+      <div class="modal-actions">
+        <button class="modal-btn" id="inappCopy">📋 複製網址</button>
+        <button class="modal-btn primary" id="inappOk">繼續逛逛</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const url = "https://nicolas5288-commits.github.io/shopfun/";
+  document.getElementById("inappCopy").onclick = async () => {
+    try { await navigator.clipboard.writeText(url); toast("已複製，貼到瀏覽器開啟吧！"); }
+    catch {
+      const ta = document.createElement("textarea");
+      ta.value = url; document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); ta.remove(); toast("已複製，貼到瀏覽器開啟吧！");
+    }
+  };
+  document.getElementById("inappOk").onclick = () => overlay.remove();
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
 async function login() {
   if (!supa) return toast("登入功能尚未設定");
+  if (inAppBrowser()) return showInAppModal(true); // 站內瀏覽器 OAuth 必失敗，直接教學
   sessionStorage.setItem("returnHash", location.hash || "#/");
   await supa.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname } });
 }
@@ -1271,5 +1315,10 @@ window.addEventListener("hashchange", route);
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch((e) => console.warn("SW 註冊失敗：", e.message));
   }
-  if (!localStorage.getItem("shopfun_guide_seen")) setTimeout(showGuideModal, 600); // 首次到訪自動說明
+  if (inAppBrowser() && !sessionStorage.getItem("shopfun_inapp_seen")) {
+    sessionStorage.setItem("shopfun_inapp_seen", "1");
+    setTimeout(showInAppModal, 600); // 站內瀏覽器提醒優先；guide 首次旗標未設，下次瀏覽器開啟時照常跳
+  } else if (!localStorage.getItem("shopfun_guide_seen")) {
+    setTimeout(showGuideModal, 600); // 首次到訪自動說明
+  }
 })();
